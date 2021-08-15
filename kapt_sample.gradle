@@ -1,0 +1,23 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+File targetFile = project.projectDir
+String moduleName = ""
+
+while (targetFile != rootProject.projectDir) {
+    moduleName = moduleName.isEmpty() ? targetFile.name.capitalize() + "Module" : "${targetFile.name.capitalize()}$moduleName"
+    targetFile = targetFile.parentFile
+}
+String regex = "-([a-z])";
+Pattern pattern = Pattern.compile(regex);
+Matcher matcher = pattern.matcher(moduleName);
+
+while (matcher.find()) {
+    moduleName = moduleName.replaceFirst(matcher.group(), matcher.group(1).toUpperCase());
+}
+
+kapt {
+    arguments {
+        arg("moduleName", moduleName)
+    }
+}
