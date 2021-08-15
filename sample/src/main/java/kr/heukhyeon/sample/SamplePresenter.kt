@@ -10,4 +10,8 @@ class SamplePresenter(
     fun getTestText(): String {
         return sampleRepository.getTestText()
     }
+
+    suspend fun updateClickedTime() : String {
+        return sampleRepository.putLatestClickedTime()
+    }
 }

@@ -226,7 +226,6 @@ class RootInjectCreator(
          * DeclaredMethod가 아닌 일반 Methods 를 사용하면 상위 인터페이스에 있는 기본구현 함수까지 모두 딸려온다.
          */
         return module.kotlin.members.filter {
-            println("in ${module.canonicalName} : ${it.name}")
             it.isOpen && defaultMethods.contains(it.name) && rootInterfaceImplementMethods.contains(it.name).not()
         }
     }

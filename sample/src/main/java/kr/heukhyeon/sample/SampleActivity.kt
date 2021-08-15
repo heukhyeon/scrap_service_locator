@@ -1,11 +1,13 @@
 package kr.heukhyeon.sample
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kr.heukhyeon.sample.databinding.ActivitySampleBinding
 import kr.heukhyeon.service_locator.EntryPoint
@@ -47,6 +49,22 @@ class SampleActivity : AppCompatActivity(), AndroidInitializer {
         super.onInitialize()
         withContext(Dispatchers.Main) {
             binding.textView.text = presenter.getTestText()
+            binding.updateButtonView.setOnClickListener {
+                binding.updateButtonView.isEnabled = false
+                binding.loadingView.visibility = View.VISIBLE
+                getCoroutineScope().launch {
+                    updateTime()
+                }
+            }
+        }
+    }
+
+    private suspend fun updateTime() {
+        val updatedText = presenter.updateClickedTime()
+        withContext(Dispatchers.Main) {
+            binding.updateButtonView.isEnabled = true
+            binding.loadingView.visibility = View.GONE
+            binding.textView.text = updatedText
         }
     }
 
