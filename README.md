@@ -199,7 +199,7 @@ When object injection is complete, the `onInitialize` function is called.
 
 ```
 // You don't necessarily have to implement AndroidInitializer in your Application.
-// This is explained in more detail below.
+// This is explained in wiki
 @ApplicationEntryPoint
 class SampleApp : Application(), AndroidInitializer {
 
@@ -219,3 +219,7 @@ class SampleApp : Application(), AndroidInitializer {
     public <init>(android.content.Context);
 }
 ```
+
+
+
+More details that are not explained in the above and sample projects are described in the [Wiki](https://github.com/heukhyeon/ScrapServiceLocator/wiki).
