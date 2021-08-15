@@ -18,7 +18,6 @@ interface ComponentOwner {
 
     val providerBuffer: LinkedList<Provider<*>>
 
-    fun getCoroutineScope() : CoroutineScope
 
     suspend fun providerInit() {
         providerBuffer.forEach {
@@ -27,7 +26,6 @@ interface ComponentOwner {
     }
 
     fun dispose() {
-        getCoroutineScope().coroutineContext.cancelChildren()
         providerBuffer.forEach {
             it.finalize()
         }

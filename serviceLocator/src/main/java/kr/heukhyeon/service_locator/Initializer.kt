@@ -47,6 +47,14 @@ interface Initializer : ComponentOwner {
 
     suspend fun onInitialize() = Unit
 
+    override fun dispose() {
+        getCoroutineScope().coroutineContext.cancelChildren()
+        super.dispose()
+    }
+
+    fun getCoroutineScope() : CoroutineScope
+
+
     suspend fun awaitStepComplete(phase: Phase) {
         return proceeded.filter { it.isCompleted(phase) }.take(1).collect()
     }
