@@ -7,7 +7,13 @@ import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.reflect.KClass
 
-
+/**
+ * The interface of the smallest unit
+ * that the class owning the component must implement, such as Activity and Fragment.
+ *
+ * This interface doesn't do anything other than dependency injection,
+ * Asynchronously performing the functions of this interface is handled by [Initializer], which is a sub-interface.
+ */
 interface ComponentOwner {
 
     val providerBuffer: LinkedList<Provider<*>>
