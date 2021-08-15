@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 30
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1-alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -55,7 +55,9 @@ dependencies {
     // Real Dependencies ScrapServiceLocator
     implementation(name: 'serviceLocator', ext: 'jar')
     implementation(name: 'serviceLocator-Android', ext: 'aar')
-    implementation(name: 'serviceLocator-AndroidScene', ext: 'aar')
+    // It is not recommended to use AndroidScene and androidx.appcompat:appcompat together.
+    //implementation(name: 'serviceLocator-AndroidScene', ext: 'aar')
+
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
     implementation "androidx.asynclayoutinflater:asynclayoutinflater:1.0.0"
 

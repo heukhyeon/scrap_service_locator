@@ -44,11 +44,6 @@ interface FragmentInitializer : AndroidInitializer {
                 val index = viewParent.indexOfChild(dummyView)
                 viewParent.removeViewAt(index)
                 viewParent.addView(root, index, dummyView.layoutParams)
-                /**
-                 * 해당 함수가 호출되어야 [androidx.fragment.app.FragmentManager.findFragment] 가 정상 작동하여
-                 * [io.anonymous.widget.sceneBase.asyncInflate.AsyncFrameLayout.parentInitializer]가 정상 할당된다.
-                 */
-//                root.setTag(androidx.fragment.R.id.fragment_container_view_tag, this)
             }
         }
     }
