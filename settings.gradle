@@ -1,0 +1,7 @@
+include ':serviceLocator'
+include ':serviceLocator-Android'
+include ':serviceLocator-AndroidScene'
+include ':processor'
+
+rootProject.name = "ScrapServiceLocator"
+
