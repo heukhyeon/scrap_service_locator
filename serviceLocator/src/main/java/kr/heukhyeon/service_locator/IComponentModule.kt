@@ -3,6 +3,9 @@ package kr.heukhyeon.service_locator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kr.heukhyeon.service_locator.provider.Provider
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
@@ -28,6 +31,8 @@ interface IComponentModule {
 
     companion object {
         val SINGLETON_OWNER = object : ComponentOwner {
+            override val providerBuffer: LinkedList<Provider<*>> = LinkedList()
+
             override fun getCoroutineScope(): CoroutineScope {
                 return CoroutineScope(EmptyCoroutineContext)
             }

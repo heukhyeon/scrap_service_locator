@@ -1,9 +1,7 @@
 package kr.heukhyeon.annotation_processor
 
 import com.squareup.kotlinpoet.*
-import kr.heukhyeon.service_locator.Component
-import kr.heukhyeon.service_locator.ComponentOwner
-import kr.heukhyeon.service_locator.EntryPoint
+import kr.heukhyeon.service_locator.*
 import kr.heukhyeon.service_locator.provider.Provider
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
@@ -16,12 +14,18 @@ import javax.lang.model.type.TypeMirror
 
 
 open class ModuleCreator(
-    protected val classSpec: TypeSpec.Builder,
+    moduleName: String,
     process: ProcessingEnvironment,
     env: RoundEnvironment
 ) : ClassCreator(process) {
     private val targets = env.getElementsAnnotatedWith(Component::class.java)
 
+    private val classSpec: TypeSpec.Builder = TypeSpec.interfaceBuilder(moduleName)
+        .addSuperinterface(IComponentModule::class)
+        .addAnnotation(
+            AnnotationSpec.builder(ComponentModule::class.java)
+                .build()
+        )
 
     private val componentTypes = targets.map { it.asType() }.toSet()
     private val additionalImplementTypes =  env
@@ -57,8 +61,9 @@ open class ModuleCreator(
     private var containParentListener = false
     private var containViewBindingProvider = false
 
-    fun create() {
-        println("시작은 됨")
+    var generatedTypes = emptyList<TypeName>()
+
+    fun create() : TypeSpec {
         targets.forEach {
             val componentType = getComponentType(it)
             val isSingleton = it.getAnnotation(Component::class.java).isSingleton
@@ -79,10 +84,16 @@ open class ModuleCreator(
         if (containParentListener) generateAbstractGetterParentListenerFunction()
         if (containViewBindingProvider) generateAbstractGetterViewBindingProviderFunction()
 
+        generatedTypes = classSpec.funSpecs
+            .filter { it.modifiers.contains(KModifier.ABSTRACT).not() }
+            .mapNotNull { it.returnType }
+        return classSpec.build()
     }
 
     private fun generateGetterFunction(componentType: ClassName, factory: CodeBlock, isSingleton: Boolean) {
         val owner = if (isSingleton) "IComponentModule.SINGLETON_OWNER" else "owner"
+
+        additionalImplementTypes.removeIf { it.toClassName() == componentType }
 
         FunSpec.builder("get" + componentType.realName(false))
             .addModifiers(KModifier.SUSPEND)

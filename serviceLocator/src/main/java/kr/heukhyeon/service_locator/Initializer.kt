@@ -28,7 +28,7 @@ interface Initializer : ComponentOwner {
             if (proceeded.value == Phase.INITIALIZED_COMPLETE) return@launch
 
             proceeded.emit(Phase.INITIALIZE_START)
-            initializeInWorkerThread()
+            withContext(Dispatchers.Default) { initializeInWorkerThread() }
             proceeded.emit(Phase.INITIALIZED_WORKER_THREAD)
             withContext(Dispatchers.Main) { initializeInMainThread() }
             proceeded.emit(Phase.INITIALIZED_MAIN_THREAD)

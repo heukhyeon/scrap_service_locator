@@ -12,10 +12,17 @@ import java.io.File
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
-class RootInjectCreator {
+class RootInjectCreator(
+    private val applicationModuleName:String?,
+    private val applicationModuleGeneratedTypes : List<TypeName>) {
 
     private val classSpec = TypeSpec.classBuilder("RootInjectorImpl")
         .addSuperinterface(RootInjector::class)
+        .also {
+            if (applicationModuleName != null) {
+                it.addSuperinterface(ClassName.bestGuess(applicationModuleName))
+            }
+        }
 
     private val modules = createReflections().getSubTypesOf(IComponentModule::class.java)
     private val rootInterfaceImplementMethods = IComponentModule::class.java.declaredMethods.map {
@@ -47,9 +54,10 @@ class RootInjectCreator {
 
         generateGetContextFunction()
 
+        generateGetterFunctionApplicationModule()
+
         generateGetInstanceOverride()
 
-        generateGetCoroutineScopeFunction()
 
         FileSpec.builder("kr.heukhyeon.service_locator", "RootInjectorImpl")
             .addType(classSpec.build())
@@ -138,16 +146,6 @@ class RootInjectCreator {
             .also(classSpec::addFunction)
     }
 
-    private fun generateGetCoroutineScopeFunction() {
-        FunSpec.builder("getCoroutineScope")
-            .addModifiers(KModifier.OVERRIDE)
-            .addModifiers(KModifier.SUSPEND)
-            .addParameter("owner", ComponentOwner::class)
-            .returns(ClassName.bestGuess("kotlinx.coroutines.CoroutineScope"))
-            .addStatement("return owner.getCoroutineScope()")
-            .build()
-            .also(classSpec::addFunction)
-    }
 
     /**
      * [RootInjector.getInstance] 에 대한 오버라이드 함수
@@ -185,6 +183,25 @@ class RootInjectCreator {
     }
 
     /**
+     * ApplicationEntryPoint 를 가진 프로젝트 내에서 직접 모듈을 만들경우 RootInjector 에 반영해준다.
+     */
+    private fun generateGetterFunctionApplicationModule() {
+        applicationModuleGeneratedTypes.forEach {
+            val className = ClassName.bestGuess(it.toString())
+            val name = "get${className.simpleNames.joinToString("")}"
+            FunSpec.builder(name)
+                .addModifiers(KModifier.OVERRIDE)
+                .addModifiers(KModifier.SUSPEND)
+                .addParameter("owner", ComponentOwner::class)
+                .returns(it)
+                .addStatement("return super<${applicationModuleName}>.$name(owner)")
+                .build()
+                .also(classSpec::addFunction)
+
+            conditionStatements.add("${it}::class -> ${name}(owner)")
+        }
+    }
+    /**
      * kotlin 1.5 기준으로, 기존 Java Interface 의 함수에 대해 기본 구현이 되었는지 여부를 표시하는 [java.lang.reflect.Method.isDefault] 는
      * 언제나 false 다.
      *
@@ -195,7 +212,6 @@ class RootInjectCreator {
      */
     private fun getDefaultImplementedFunctions(module: Class<out IComponentModule>): List<KCallable<*>> {
 
-        println("Module : ${module.canonicalName}")
         /**
          * 디컴파일시 확인되는 inner static class 의 이름을 추가로 입력해 클래스 객체를 뽑아온다.
          */

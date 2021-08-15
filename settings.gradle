@@ -5,3 +5,4 @@ include ':processor'
 
 rootProject.name = "ScrapServiceLocator"
 
+include ':sample'

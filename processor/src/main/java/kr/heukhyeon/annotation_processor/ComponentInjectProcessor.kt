@@ -23,27 +23,27 @@ class ComponentInjectProcessor : AbstractProcessor() {
     }
 
     override fun process(p0: MutableSet<out TypeElement>?, p1: RoundEnvironment?): Boolean {
-        val componentList = p1?.getElementsAnnotatedWith(Component::class.java)
-        val entryPointList = p1?.getElementsAnnotatedWith(EntryPoint::class.java)
-        if (componentList.isNullOrEmpty() && entryPointList.isNullOrEmpty()) return false
-
-        val rootFile = processingEnvironment.options["kapt.kotlin.generated"]?.replace("kaptKotlin", "kapt")
-            ?.let { File(it) }!!
-        val moduleName = requireNotNull(processingEnvironment.options["moduleName"])
-
-        val fileSpec = FileSpec.builder("io.anonymous.module", moduleName)
-        val classSpec = TypeSpec.interfaceBuilder(moduleName)
-            .addSuperinterface(IComponentModule::class)
-            .addAnnotation(
-                AnnotationSpec.builder(ComponentModule::class.java)
-                    .build()
-            )
-
-        ModuleCreator(classSpec, processingEnvironment, p1).create()
-
-        fileSpec
-            .addType(classSpec.build())
-            .build().writeTo(rootFile)
+//        val componentList = p1?.getElementsAnnotatedWith(Component::class.java)
+//        val entryPointList = p1?.getElementsAnnotatedWith(EntryPoint::class.java)
+//        if (componentList.isNullOrEmpty() && entryPointList.isNullOrEmpty()) return false
+//
+//        val rootFile = processingEnvironment.options["kapt.kotlin.generated"]?.replace("kaptKotlin", "kapt")
+//            ?.let { File(it) }!!
+//        val moduleName = requireNotNull(processingEnvironment.options["moduleName"])
+//
+//        val fileSpec = FileSpec.builder("io.anonymous.module", moduleName)
+//        val classSpec = TypeSpec.interfaceBuilder(moduleName)
+//            .addSuperinterface(IComponentModule::class)
+//            .addAnnotation(
+//                AnnotationSpec.builder(ComponentModule::class.java)
+//                    .build()
+//            )
+//
+//        ModuleCreator(moduleName, processingEnvironment, p1).create()
+//
+//        fileSpec
+//            .addType(classSpec.build())
+//            .build().writeTo(rootFile)
         return false
     }
 

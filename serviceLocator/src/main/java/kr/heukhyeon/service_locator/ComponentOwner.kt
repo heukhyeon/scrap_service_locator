@@ -10,19 +10,19 @@ import kotlin.reflect.KClass
 
 interface ComponentOwner {
 
-    val providerBuffer: LinkedList<Provider<*>>? get() = null
+    val providerBuffer: LinkedList<Provider<*>>
 
     fun getCoroutineScope() : CoroutineScope
 
     suspend fun providerInit() {
-        requireNotNull(providerBuffer).forEach {
+        providerBuffer.forEach {
             it.inject(this)
         }
     }
 
     fun dispose() {
         getCoroutineScope().coroutineContext.cancelChildren()
-        providerBuffer?.forEach {
+        providerBuffer.forEach {
             it.finalize()
         }
         RootInjector.onDisposeComponentOwner(this)
@@ -30,8 +30,9 @@ interface ComponentOwner {
 
     fun <T : Any> inject(clazz: KClass<T>, injectImmediate:Boolean = false): Provider<T> {
         val instance = Provider(clazz)
-        requireNotNull(providerBuffer).add(instance)
-        if (injectImmediate) runBlocking { instance.inject(this@ComponentOwner) }
-        return instance
+        providerBuffer.add(instance)
+            if (injectImmediate) runBlocking { instance.inject(this@ComponentOwner) }
+            return instance
+
     }
 }
