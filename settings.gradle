@@ -6,3 +6,5 @@ include ':processor'
 rootProject.name = "ScrapServiceLocator"
 
 include ':sample'
+include ':sample_without_appcompat'
+
