@@ -53,7 +53,7 @@ dependencies {
     implementation(name: 'serviceLocator-AndroidScene', ext: 'aar')
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
 
-    kapt project(':processor')
+//    kapt project(':service_locator_processor')
 
     // If your build fails during kapt, add the dependency below.
     implementation 'com.squareup:kotlinpoet:1.6.0'

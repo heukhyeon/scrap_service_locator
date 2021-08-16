@@ -1,7 +1,10 @@
 plugins {
     id 'java-library'
     id 'kotlin'
+    id 'maven-publish'
 }
+
+apply from: '../publish.gradle'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_6

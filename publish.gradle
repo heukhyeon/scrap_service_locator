@@ -1,0 +1,10 @@
+group = 'kr.heukhyeon'
+version = publishVersion
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
