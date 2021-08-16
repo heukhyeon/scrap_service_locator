@@ -62,9 +62,9 @@ kapt {
 dependencies {
 
 ...
-    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev-fix4'
-    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.1-alpha-dev-fix4'
-    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev-fix4'
+    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.2-20210816'
+    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.2-20210816'
+    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.2-20210816'
 }
 ```
 
@@ -78,7 +78,8 @@ The basic dependency injection method is the same as that of Koin.
 
 For classes that cannot control the constructor (activities, fragments, etc.), use the `inject()` delegate function,
 ```
-class SampleActivity : AppCompatActivity(), AndroidInitializer {
+// if Activity, implements ActivityInitializer, if Fragment, implements FragmentInitializer
+class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
    ...
     private val presenter by inject(SamplePresenter::class)
@@ -162,33 +163,9 @@ If false , different unique objects are returned for different objects.
 The default value is returned only when requesting a dependency on itself (SampleRepositoryImpl).
 
 
-### 3. When an activity that implements the `AndroidInitializer` interface, or a Fragment, starts, the `startInitialize` function is called.
+### 3. Add `@ApplicationEntryPoint` annotation to your Application class and call `RootInjector.initialize(this)` at onCreate time.
 
-This library really wants to avoid creating objects on the main thread, so it rejects both methods below.
-
-
-- Koin: Creates an object at the time the object is referenced.
-
-- Hilt: Creates an object when the owner of the object (Activity, Fragment, etc.) starts.
-
-```
-@EntryPoint
-class SampleActivity : AppCompatActivity(), AndroidInitializer {
-
-...
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        startInitialize()
-    }
-```
-When object injection is complete, the `onInitialize` function is called.
-
-**Until this function is called, an error may occur when the activity or fragment tries to access the component class.**
-
-### 4. Add `@ApplicationEntryPoint` annotation to your Application class and call `RootInjector.initialize(this)` at onCreate time.
-
-```
+<pre>
 // You don't necessarily have to implement AndroidInitializer in your Application.
 // This is explained in wiki
 @ApplicationEntryPoint
@@ -197,12 +174,57 @@ class SampleApp : Application(), AndroidInitializer {
 ...
     override fun onCreate() {
         super.onCreate()
-        //IMPORTANT
-        RootInjector.initialize(this)
+        // IMPORTANT
+        <b>RootInjector.initialize(this)</b>
+	// If you are using the `service_locator_android` library, you must call this.
+	<b>InjectLifecycleManager.initialize(this)</b>
         startInitialize()
     }
 }
-```
+</pre>
+
+### 4. Move your initialization logic after overriding the onInitialize function.
+
+<pre>
+@EntryPoint
+class SampleActivity : AppCompatActivity(), ActivityInitializer {
+
+    private val presenter by inject(SamplePresenter::class)
+    private val binding by inject(ActivitySampleBinding::class)
+
+...
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_sample_loading)
+
+        // AS-IS, BAD !!!!
+        onInit()
+    }
+
+    override suspend fun onInitialize() {
+        super.onInitialize()
+        withContext(Dispatchers.Main) {
+
+            // TO-BE, GOOD!
+            onInit()
+        }
+    }
+
+    // My Initialize Function
+    private fun onInit() {
+        binding.textView.text = presenter.getTestText()
+        binding.updateButtonView.setOnClickListener {
+            binding.updateButtonView.isEnabled = false
+            binding.loadingView.visibility = View.VISIBLE
+            getCoroutineScope().launch {
+                updateTime()
+            }
+        }
+    }
+
+...
+
+</pre>
 
 ### 5. If you are using proguard, add the following statement to your proguard rules.
 ```
