@@ -3,7 +3,7 @@ include ':service_locator_android'
 include ':service_locator_processor'
 //include ':serviceLocator-AndroidScene'
 
-rootProject.name = "ScrapServiceLocator"
+rootProject.name = "scrap_service_locator"
 
 include ':sample'
 //include ':sample_without_appcompat'
