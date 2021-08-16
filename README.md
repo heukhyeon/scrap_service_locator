@@ -21,8 +21,16 @@ So, as a simple trick using kapt , I wanted to make the dependency injection str
 ## How to use ( Gradle Settings )
 
 
-1. **Fork this project and build it.**
+1. Add it in your root build.gradle at the end of repositories:
 
+```
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
 
 2. Add Depdendencies in Your application level `build.gradle`
 
@@ -54,9 +62,9 @@ kapt {
 dependencies {
 
 ...
-    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev'
-    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.1-alpha-dev'
-    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev'
+    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev-fix4'
+    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.1-alpha-dev-fix4'
+    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev-fix4'
 }
 ```
 
