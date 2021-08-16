@@ -62,9 +62,9 @@ kapt {
 dependencies {
 
 ...
-    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev-fix4'
-    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.1-alpha-dev-fix4'
-    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev-fix4'
+    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.2-20210816'
+    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.2-20210816'
+    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.2-20210816'
 }
 ```
 
