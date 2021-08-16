@@ -2,7 +2,7 @@
 buildscript {
     ext.kotlin_version = "1.4.32"
     ext.projectJars = "${rootProject.projectDir}\\projectJars"
-    ext.publishVersion = '0.0.2-20210816-03'
+    ext.publishVersion = '0.0.2-20210816-04'
     repositories {
         google()
         jcenter()

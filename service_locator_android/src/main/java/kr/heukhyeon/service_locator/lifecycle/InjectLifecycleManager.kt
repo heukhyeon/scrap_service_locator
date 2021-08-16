@@ -64,6 +64,7 @@ class InjectLifecycleManager(app: Application) {
         requireNotNull(stateMap[initializer]).also { state ->
             state.isInitialized = true
             state.children.forEach { it.resume(Unit) }
+            state.children.clear()
         }
     }
 

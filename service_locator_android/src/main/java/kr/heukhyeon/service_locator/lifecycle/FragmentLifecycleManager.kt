@@ -41,8 +41,8 @@ internal class FragmentLifecycleManager(
     override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
         super.onFragmentViewDestroyed(fm, f)
         if (f !is AndroidInitializer) return
-        requireNotNull(parentMap[f]).isInitialized = false
         f.dispose()
+        requireNotNull(parentMap[f]).isInitialized = false
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
