@@ -10,40 +10,29 @@ import kr.heukhyeon.service_locator.Initializer
 
 interface FragmentInitializer : AndroidInitializer {
 
-    override val parentInitializer: AndroidInitializer
-        get() {
-            val parentFragment = getParentFragment()
-            val activity = getActivity()
-            require(parentFragment != null || activity != null)
-
-            if (parentFragment != null) {
-                require(parentFragment is AndroidInitializer)
-                return parentFragment
-            }
-            require(activity is AndroidInitializer)
-            return activity
-        }
-
-    override val delayUntilParentStep: Initializer.Phase
-        get() = Initializer.Phase.INITIALIZED_COMPLETE
+    /**
+     * true (기본값) 일경우, 초기화 단계에서 Fragment 에 정의된 "첫번째" ViewBinding 을 ParentView 에 붙인다.
+     * false 로 재정의한경우, 구현 Fragment 가 직접 초기화가 완료된 ViewBinding 을 뷰 계층에 추가해야한다.
+     */
+    val isAutoAttachView : Boolean get() = true
 
     fun getView(): View?
-    fun getActivity(): Activity?
-    fun getParentFragment(): Fragment?
     fun getArguments(): Bundle?
     fun setArguments(bundle: Bundle?)
 
     override suspend fun initializeInMainThread() {
         super.initializeInMainThread()
-        getViewProviders().also { buffer ->
-            if (buffer.isNotEmpty()) {
-                val dummyView = getView()
-                val root = buffer[0].instance!!.root
-                val viewParent = dummyView?.parent
-                require(viewParent is ViewGroup)
-                val index = viewParent.indexOfChild(dummyView)
-                viewParent.removeViewAt(index)
-                viewParent.addView(root, index, dummyView.layoutParams)
+        if (isAutoAttachView) {
+            getViewProviders().also { buffer ->
+                if (buffer.isNotEmpty()) {
+                    val dummyView = getView()
+                    val root = buffer[0].instance!!.root
+                    val viewParent = dummyView?.parent
+                    require(viewParent is ViewGroup)
+                    val index = viewParent.indexOfChild(dummyView)
+                    viewParent.removeViewAt(index)
+                    viewParent.addView(root, index, dummyView.layoutParams)
+                }
             }
         }
     }

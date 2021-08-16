@@ -21,19 +21,25 @@ interface Initializer : ComponentOwner {
         }
     }
 
-    val proceeded: MutableStateFlow<Phase>
+    /**
+     * 현재 초기화 단계를 알고싶을경우, 반드시 고정 객체로 초기화해야한다.
+     */
+    val proceeded: MutableStateFlow<Phase>?
 
     fun startInitialize() {
         getCoroutineScope().launch {
-            if (proceeded.value == Phase.INITIALIZED_COMPLETE) return@launch
 
-            proceeded.emit(Phase.INITIALIZE_START)
+            if (proceeded != null) require(proceeded === proceeded)
+
+            if (proceeded?.value == Phase.INITIALIZED_COMPLETE) return@launch
+
+            proceeded?.emit(Phase.INITIALIZE_START)
             withContext(Dispatchers.Default) { initializeInWorkerThread() }
-            proceeded.emit(Phase.INITIALIZED_WORKER_THREAD)
+            proceeded?.emit(Phase.INITIALIZED_WORKER_THREAD)
             withContext(Dispatchers.Main) { initializeInMainThread() }
-            proceeded.emit(Phase.INITIALIZED_MAIN_THREAD)
+            proceeded?.emit(Phase.INITIALIZED_MAIN_THREAD)
             onInitialize()
-            proceeded.emit(Phase.INITIALIZED_COMPLETE)
+            proceeded?.emit(Phase.INITIALIZED_COMPLETE)
         }
     }
 
@@ -53,9 +59,4 @@ interface Initializer : ComponentOwner {
     }
 
     fun getCoroutineScope() : CoroutineScope
-
-
-    suspend fun awaitStepComplete(phase: Phase) {
-        return proceeded.filter { it.isCompleted(phase) }.take(1).collect()
-    }
 }

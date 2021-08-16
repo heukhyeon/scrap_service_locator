@@ -54,7 +54,7 @@ dependencies {
 
     implementation project(":service_locator_android")
     implementation project(":service_locator")
-    implementation project(":service_locator_processor")
+//    implementation project(":service_locator_processor")
 
     kapt project(":service_locator_processor")
 

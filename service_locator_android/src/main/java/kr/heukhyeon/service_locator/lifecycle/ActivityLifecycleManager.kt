@@ -1,0 +1,39 @@
+package kr.heukhyeon.service_locator.lifecycle
+
+import android.app.Activity
+import android.app.Application
+import android.os.Bundle
+import androidx.fragment.app.FragmentActivity
+import kr.heukhyeon.service_locator.initializer.AndroidInitializer
+import kotlin.collections.HashMap
+
+internal class ActivityLifecycleManager(
+    private val parentMap: HashMap<AndroidInitializer, InjectLifecycleManager.State>,
+    private val fragmentLifecycleManager: FragmentLifecycleManager
+) : Application.ActivityLifecycleCallbacks {
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        if (activity !is AndroidInitializer || activity !is FragmentActivity) return
+        require(parentMap.containsKey(activity).not())
+        parentMap[activity] = InjectLifecycleManager.State()
+        activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleManager, true)
+        activity.startInitialize()
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+        if (activity !is AndroidInitializer || activity !is FragmentActivity) return
+        activity.supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentLifecycleManager)
+        activity.dispose()
+        parentMap.remove(activity)
+    }
+
+    override fun onActivityStarted(activity: Activity) = Unit
+
+    override fun onActivityResumed(activity: Activity) = Unit
+
+    override fun onActivityPaused(activity: Activity) = Unit
+
+    override fun onActivityStopped(activity: Activity) = Unit
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
+}
