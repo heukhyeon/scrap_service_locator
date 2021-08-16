@@ -16,13 +16,16 @@ internal class ActivityLifecycleManager(
         if (activity !is AndroidInitializer || activity !is FragmentActivity) return
         require(parentMap.containsKey(activity).not())
         parentMap[activity] = InjectLifecycleManager.State()
-        activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleManager, true)
+        fragmentLifecycleManager.onCreateActivity(activity)
         activity.startInitialize()
     }
 
     override fun onActivityDestroyed(activity: Activity) {
         if (activity !is AndroidInitializer || activity !is FragmentActivity) return
-        activity.supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentLifecycleManager)
+        /**
+         * 이게 주석인 이유는 [FragmentLifecycleManager.onCreateActivity] 의 주석 참고
+         */
+        // activity.supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentLifecycleManager)
         activity.dispose()
         parentMap.remove(activity)
     }
