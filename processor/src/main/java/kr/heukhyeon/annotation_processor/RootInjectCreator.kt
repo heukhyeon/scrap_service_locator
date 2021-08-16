@@ -13,7 +13,13 @@ import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
 class RootInjectCreator(
+    /**
+     * 실행되는 안드로이드 어플리케이션 모듈 내에서도 [IComponentModule] 을 구현하는 인터페이스가 만들어지는 경우 해당 인터페이스의 이름
+     */
     private val applicationModuleName:String?,
+    /**
+     * 실행되는 안드로이드 어플리케이션 모듈 내에서도 [IComponentModule] 을 구현하는 인터페이스가 만들어지는 경우 해당 인터페이스가 주입하는 의존성 타입 목록
+     */
     private val applicationModuleGeneratedTypes : List<TypeName>) {
 
     private val classSpec = TypeSpec.classBuilder("RootInjectorImpl")
@@ -41,8 +47,14 @@ class RootInjectCreator(
             classSpec.addSuperinterface(moduleClazz)
         }
 
+        /**
+         * 생성자 정의
+         */
         generateConstructor()
 
+        /**
+         * [IComponentModule.cachingAndReturn] 에서 캐싱할 맵 정의
+         */
         generateSingletonMap()
 
         /**
@@ -54,8 +66,15 @@ class RootInjectCreator(
 
         generateGetContextFunction()
 
+        /**
+         * 어노테이션 프로세서 실행 시점에 어플리케이션 내의 모듈은 아직 컴파일되지 않았으므로 [generateGetterFunction] 을 직접 사용할수 없다.
+         * 같은 구현을 어플리케이션 모듈 한정으로 다시 추가한다.
+         */
         generateGetterFunctionApplicationModule()
 
+        /**
+         * [kr.heukhyeon.service_locator.provider.Provider] 가 실제로 객체를 요청햇을때 반환하는 함수를 구현한다.
+         */
         generateGetInstanceOverride()
 
 
@@ -93,7 +112,7 @@ class RootInjectCreator(
     }
 
     /**
-     * 싱글턴 객체를 캐싱하는 맵 필드를 만든다.
+     * 객체를 캐싱하는 맵 필드를 만든다.
      */
     private fun generateSingletonMap() {
         PropertySpec.builder(

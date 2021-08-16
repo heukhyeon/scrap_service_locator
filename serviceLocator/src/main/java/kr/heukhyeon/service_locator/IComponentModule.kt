@@ -32,10 +32,6 @@ interface IComponentModule {
     companion object {
         val SINGLETON_OWNER = object : ComponentOwner {
             override val providerBuffer: LinkedList<Provider<*>> = LinkedList()
-
-            override fun getCoroutineScope(): CoroutineScope {
-                return CoroutineScope(EmptyCoroutineContext)
-            }
         }
     }
 }

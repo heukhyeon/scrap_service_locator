@@ -13,7 +13,7 @@ import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeMirror
 
 
-open class ModuleCreator(
+class ModuleCreator(
     moduleName: String,
     process: ProcessingEnvironment,
     env: RoundEnvironment
@@ -28,6 +28,19 @@ open class ModuleCreator(
         )
 
     private val componentTypes = targets.map { it.asType() }.toSet()
+
+    /**
+     * @EntryPoint
+     * class SomeActivity : AppCompatActivity {
+     *      private val binding by inject(MyViewBinding::class)
+     * }
+     *
+     * ViewBinding 과 같이, @Component 어노테이션이 붙은 컴포넌트에는 요구되지 않지만,
+     * @EntryPoint 어노테이션이 붙은 클래스에서 요구되는 경우가 존재할수 있다.
+     *
+     * 이에 @EntryPoint 어노테이션이 붙은 클래스에서 [ComponentOwner.inject] 함수가 호출된경우,
+     * 해당 함수의 종속성 타입을 추가적으로 구현한다.
+     */
     private val additionalImplementTypes =  env
         .getElementsAnnotatedWith(EntryPoint::class.java)
         .flatMap { entryPoint ->
@@ -80,8 +93,17 @@ open class ModuleCreator(
             }
             .forEach(this::generateAdditionalParamsFunction)
 
+        /**
+         * 현재 작성중인 모듈에서 Parcelable에 대한 종속성이 요구되는경우, Parcelable 추상함수를 추가한다.
+         */
         if (containParcelable) generateAbstractGetterParcelableFunction()
+        /**
+         * 현재 작성중인 모듈에서 FragmentParentListener 에 대한 종속성이 요구되는경우, Parcelable 추상함수를 추가한다.
+         */
         if (containParentListener) generateAbstractGetterParentListenerFunction()
+        /**
+         * 현재 작성중인 모듈에서 ViewBinding 에 대한 종속성이 요구되는경우, ViewBindingProvider 추상함수를 추가한다.
+         */
         if (containViewBindingProvider) generateAbstractGetterViewBindingProviderFunction()
 
         generatedTypes = classSpec.funSpecs
@@ -90,6 +112,13 @@ open class ModuleCreator(
         return classSpec.build()
     }
 
+    /**
+     * 객체 주입 요청이 들어왔을때 해당 객체를 반환하는 함수를 추가한다.
+     * @params
+     * [componentType] : 반환되는 타입
+     * [factory] : 해당 객체의 생성방법, 일반적으로 [generateFactoryCodeForNormal] 다.
+     * [isSingleton] : [Component.isSingleton] 을 통해 획득한, 해당 객체가 싱글턴 객체로 존재해야하는지 여부
+     */
     private fun generateGetterFunction(componentType: ClassName, factory: CodeBlock, isSingleton: Boolean) {
         val owner = if (isSingleton) "IComponentModule.SINGLETON_OWNER" else "owner"
 
@@ -138,6 +167,10 @@ open class ModuleCreator(
         }
     }
 
+    /**
+     * [Component] 어노테이션이 붙은 객체가 스스로를 다른 타입으로 바인딩한다 지정한경우 ([Component.bind] != Any::class)
+     * 해당 타입으로 반환하고, 그렇지않은경우 객체 자신의 타입을 반환한다.
+     */
     protected fun getComponentType(element: Element): ClassName {
         val clazz = try {
             element.getAnnotation(Component::class.java).bind.qualifiedName
@@ -174,6 +207,9 @@ open class ModuleCreator(
             .build()
     }
 
+    /**
+     * ViewBinding 을 상속하는 타입에 대한 객체 생성 함수를 정의한다.
+     */
     protected fun generateFactoryCodeForViewBinding(targetType: ClassName): CodeBlock {
         return CodeBlock.builder()
             .add("{\n")
@@ -185,6 +221,9 @@ open class ModuleCreator(
             .build()
     }
 
+    /**
+     * Parcelable 을 상속하는 타입에 대한 객체 생성 함수를 정의한다.
+     */
     protected fun generateFactoryCodeForParcelable(): CodeBlock {
         return CodeBlock.builder()
             .add("{\n")
@@ -193,6 +232,9 @@ open class ModuleCreator(
             .build()
     }
 
+    /**
+     * FragmentParentListener 를 상속하는 타입에 대한 객체 생성 함수를 정의한다.
+     */
     protected fun generateFactoryCodeForParentListener(): CodeBlock {
         return CodeBlock.builder()
             .add("{\n")
