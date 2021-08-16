@@ -228,7 +228,7 @@ class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
 ### 5. If you are using proguard, add the following statement to your proguard rules.
 ```
--keepclassmembers class * extends io.anonymous.service_locator.RootInjector {
+-keepclassmembers class * extends kr.heukhyeon.service_locator.RootInjector {
     public <init>(android.content.Context);
 }
 ```
