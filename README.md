@@ -22,13 +22,11 @@ So, as a simple trick using kapt , I wanted to make the dependency injection str
 
 
 1. **Fork this project and build it.**
-2. If you don't do anything else, you can see that there are jar files and aar files in the "projectJars" folder in the project.
-- `processor.jar`
-- `serviceLocator.jar`
-- `serviceLocator-Android.aar`
-- `serviceLocator-AndroidScene.aar`
-3. Include the output of step 2 directly in your project (by putting it in a folder like `libs`).
-4. Add dependencies to your application or library level gradle.
+
+
+2. Add Depdendencies in Your application level `build.gradle`
+
+[![Release](https://jitpack.io/v/heukhyeon/scrap_service_locator.svg)](https://jitpack.io/#heukhyeon/scrap_service_locator)
 
 ```
 plugins {
@@ -56,24 +54,9 @@ kapt {
 dependencies {
 
 ...
-    // Core Dependencies ScrapServiceLocator
-    implementation(name: 'serviceLocator', ext: 'jar')
-    // If you're using a ViewBinding, or inter-screen data communication via Parcelable, it's recommended to include it.
-    implementation(name: 'serviceLocator-Android', ext: 'aar')
-    
-    
-    // If you haven't already used coroutines, you should add them.
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
-
-    kapt(name: 'processor', ext: 'jar')
-
-    // If your build fails during kapt, add the dependency below.
-    implementation 'com.squareup:kotlinpoet:1.6.0'
-    
-    // If you don't use appcompat and want to use Android-Scene aar, include it.
-    implementation(name: 'serviceLocator-AndroidScene', ext: 'aar')
-    implementation 'androidx.fragment:fragment:1.3.6'
-
+    implementation 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev'
+    implementation 'com.github.heukhyeon:scrap_service_locator_android:0.0.1-alpha-dev'
+    kapt 'com.github.heukhyeon:scrap_service_locator:0.0.1-alpha-dev'
 }
 ```
 
