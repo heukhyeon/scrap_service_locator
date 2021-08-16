@@ -49,7 +49,6 @@ class InjectLifecycleManager(app: Application) {
 
     @WorkerThread
     suspend fun awaitInitializerReady(initializer: AndroidInitializer) {
-        if (initializer !is Activity) return
         val parent = getParentInitializer(initializer) ?: return
         val state = requireNotNull(stateMap[parent])
 
