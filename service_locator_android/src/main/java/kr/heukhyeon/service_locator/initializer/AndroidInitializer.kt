@@ -19,6 +19,8 @@ interface AndroidInitializer : Initializer {
     override val proceeded: MutableStateFlow<Initializer.Phase>?
         get() = null
 
+    val isInitialized get() = InjectLifecycleManager.getInstance().isInitialized(this)
+
     @WorkerThread
     override suspend fun initializeInWorkerThread() {
         InjectLifecycleManager.getInstance().awaitInitializerReady(this)

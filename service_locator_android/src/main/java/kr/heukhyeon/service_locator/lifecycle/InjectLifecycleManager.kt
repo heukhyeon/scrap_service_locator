@@ -2,7 +2,6 @@ package kr.heukhyeon.service_locator.lifecycle
 
 import android.app.Activity
 import android.app.Application
-import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
 import kr.heukhyeon.service_locator.initializer.AndroidInitializer
@@ -13,7 +12,14 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class InjectLifecycleManager(context: Context) {
+/**
+ * [AndroidInitializer] 를 구현한 클래스들의 [AndroidInitializer.startInitialize] 의존성 주입 작업이
+ * Application
+ *  ㄴ Activity
+ *      ㄴ Fragment
+ *   로 이어지는 Android Lifecycle Tree 에 따라 순차적으로 진행될수 있게 한다.
+ */
+class InjectLifecycleManager(app: Application) {
 
     class State {
         var isInitialized = false
@@ -27,12 +33,18 @@ class InjectLifecycleManager(context: Context) {
 
 
     init {
-        require(context is Application)
-        if (context is AndroidInitializer) {
-            stateMap[context] = State()
+        if (app is AndroidInitializer) {
+            stateMap[app] = State()
         }
 
-        context.registerActivityLifecycleCallbacks(activityManager)
+        app.registerActivityLifecycleCallbacks(activityManager)
+    }
+
+    /**
+     * 파라미터로 넘어온 객체가 [onInitialize] 가 호출됬는지를 확인한다.
+     */
+    fun isInitialized(initializer: AndroidInitializer) : Boolean {
+        return requireNotNull(stateMap[initializer]).isInitialized
     }
 
     @WorkerThread
