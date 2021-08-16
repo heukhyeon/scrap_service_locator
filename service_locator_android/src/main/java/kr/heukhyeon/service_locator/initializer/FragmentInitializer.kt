@@ -1,20 +1,23 @@
 package kr.heukhyeon.service_locator.initializer
 
-import android.app.Activity
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kr.heukhyeon.service_locator.Initializer
 
 interface FragmentInitializer : AndroidInitializer {
 
     /**
-     * true (기본값) 일경우, 초기화 단계에서 Fragment 에 정의된 "첫번째" ViewBinding 을 ParentView 에 붙인다.
-     * false 로 재정의한경우, 구현 Fragment 가 직접 초기화가 완료된 ViewBinding 을 뷰 계층에 추가해야한다.
+     * [Fragment.getView] 는 재정의 가능한 함수지만, 안드로이드는 [Fragment.getView] 가 [Fragment.onCreateView] 때 생성한 뷰와 다르다 해도
+     * [Fragment.mView] 를 업데이트하지 않으며, [Fragment.mView] 는 [androidx.fragment.app.FragmentTransaction] 에서 활용된다.
+     *
+     * 그러므로 [getView] 를 오버라이드해 [getViewProviders] 에서 만들어진 뷰를 리턴하는경우
+     * [androidx.fragment.app.FragmentTransaction] 의 작동이 예상한대로 이루어지지 않을수 있다.
+     *
+     * 이때문에 기본값은 false 이며, true 라 해도 기존의 [getView] 를 뷰 계층에서 제거하지 않고, [getView] 의 하위 계층에 추가한다.
      */
-    val isAutoAttachView : Boolean get() = true
+    val isAutoAttachView : Boolean get() = false
 
     fun getView(): View?
     fun getArguments(): Bundle?
@@ -22,16 +25,13 @@ interface FragmentInitializer : AndroidInitializer {
 
     override suspend fun initializeInMainThread() {
         super.initializeInMainThread()
-        if (isAutoAttachView) {
+        val existingView = getView()
+
+        if (isAutoAttachView && existingView is ViewGroup) {
             getViewProviders().also { buffer ->
                 if (buffer.isNotEmpty()) {
-                    val dummyView = getView()
                     val root = buffer[0].instance!!.root
-                    val viewParent = dummyView?.parent
-                    require(viewParent is ViewGroup)
-                    val index = viewParent.indexOfChild(dummyView)
-                    viewParent.removeViewAt(index)
-                    viewParent.addView(root, index, dummyView.layoutParams)
+                    existingView.addView(root)
                 }
             }
         }
