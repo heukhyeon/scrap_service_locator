@@ -17,7 +17,7 @@ class ComponentProcessor : AbstractProcessor() {
     private lateinit var env: ProcessingEnvironment
     private lateinit var rootFile: File
     private var moduleName = ""
-    private var generatedTypes = emptyList<TypeName>()
+    private var generatedTypes = emptyList<Pair<String, TypeName>>()
 
     override fun init(p0: ProcessingEnvironment?) {
         super.init(p0)
@@ -54,7 +54,7 @@ class ComponentProcessor : AbstractProcessor() {
         if (appEntryPoint.isNotEmpty()) {
             require(appEntryPoint.size == 1)
             val applicationModuleName = if (generatedTypes.isNotEmpty()) "io.anonymous.module.$moduleName" else null
-            RootInjectCreator(applicationModuleName, generatedTypes).create(rootFile)
+            RootInjectCreator(env, applicationModuleName, generatedTypes,).create(rootFile)
         }
         return false
     }

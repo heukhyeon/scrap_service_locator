@@ -4,8 +4,9 @@ import kr.heukhyeon.service_locator.Component
 
 @Component
 class SamplePresenter(
-    private val sampleRepository: SampleRepository
-) {
+    @SampleQualifier private val sampleRepository: SampleRepository,
+    private val sampleRepository2: SampleRepository
+    ) {
 
     fun getTestText(): String {
         return sampleRepository.getTestText()

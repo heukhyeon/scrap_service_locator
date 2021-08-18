@@ -3,27 +3,13 @@ package kr.heukhyeon.annotation_processor
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
-import java.lang.NullPointerException
 import java.util.*
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
 
-open class ClassCreator(protected val runtimeEnv: ProcessingEnvironment) {
+interface ICodeCreateHelper {
 
-    /**
-     * Null 인경우 포함이 안된경우 (예 : 안드로이드 비의존적인 모듈에서 DataBinding 참조 등)임
-     */
-    protected fun getType(canonicalName:CharSequence) : TypeMirror? {
-        return try {
-            runtimeEnv.elementUtils.getTypeElement(canonicalName).asType()
-        }
-        catch (e: NullPointerException) {
-            null
-        }
-    }
-
-    protected fun viewBindingToPackageAndLayoutId(name: ClassName): String {
+    fun viewBindingToPackageAndLayoutId(name: ClassName): String {
         val regex = "([a-z])([A-Z]+)"
         val replacement = "$1_$2"
         val layoutId = name.simpleName
@@ -39,26 +25,18 @@ open class ClassCreator(protected val runtimeEnv: ProcessingEnvironment) {
         return "$packageName.R.layout.$layoutId"
     }
 
-    protected fun TypeMirror.isSubType(superType:TypeMirror?): Boolean {
-        if (superType == null) return false
-
-        return runtimeEnv.typeUtils.isSubtype(this, superType)
-    }
-
-
-
-    protected fun Element.toClassName(): ClassName {
+    fun Element.toClassName(): ClassName {
         return ClassName.bestGuess(toString())
     }
 
-    protected fun TypeMirror.toClassName(): ClassName {
+    fun TypeMirror.toClassName(): ClassName {
         return ClassName.bestGuess(toString())
     }
 
-    protected fun ClassName.realName(containDot: Boolean) =
+    fun ClassName.realName(containDot: Boolean) =
         simpleNames.joinToString(if (containDot) "." else "")
 
-    protected fun FunSpec.Builder.addCodeWithTab(
+    fun FunSpec.Builder.addCodeWithTab(
         tabCount: Int,
         format: String,
         vararg args: Any
@@ -66,11 +44,16 @@ open class ClassCreator(protected val runtimeEnv: ProcessingEnvironment) {
         return addCode(CodeBlock.builder().addCodeWithTab(tabCount, format, *args).build())
     }
 
-    protected fun CodeBlock.Builder.addCodeWithTab(
+    fun CodeBlock.Builder.addCodeWithTab(
         tabCount: Int,
         format: String,
         vararg args: Any
     ): CodeBlock.Builder {
         return add("${(0 until tabCount).map { '\t' }.joinToString("")}$format", *args)
+    }
+
+    fun createGetterFunctionName(type: ClassName, qualifier: TypeMirror?): String {
+        val postfix = if(qualifier == null) "" else "With${qualifier.toClassName().realName(false)}"
+        return "get${type.realName(false)}$postfix"
     }
 }

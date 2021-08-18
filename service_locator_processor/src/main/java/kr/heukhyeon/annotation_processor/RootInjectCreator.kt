@@ -9,18 +9,21 @@ import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.util.FilterBuilder
 import java.io.File
+import javax.annotation.processing.ProcessingEnvironment
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 
 class RootInjectCreator(
+    env: ProcessingEnvironment,
     /**
      * 실행되는 안드로이드 어플리케이션 모듈 내에서도 [IComponentModule] 을 구현하는 인터페이스가 만들어지는 경우 해당 인터페이스의 이름
      */
-    private val applicationModuleName:String?,
+    private val applicationModuleName: String?,
     /**
      * 실행되는 안드로이드 어플리케이션 모듈 내에서도 [IComponentModule] 을 구현하는 인터페이스가 만들어지는 경우 해당 인터페이스가 주입하는 의존성 타입 목록
      */
-    private val applicationModuleGeneratedTypes : List<TypeName>) {
+    private val applicationModuleGeneratedTypes: List<Pair<String, TypeName>>,
+) : CodeCreateHelper(env) {
 
     private val classSpec = TypeSpec.classBuilder("RootInjectorImpl")
         .addSuperinterface(RootInjector::class)
@@ -131,7 +134,6 @@ class RootInjectCreator(
     private fun generateGetterFunction(module: Class<out IComponentModule>) {
         getDefaultImplementedFunctions(module).forEach { method ->
             val name = method.name
-
             FunSpec.builder(method.name)
                 .addModifiers(KModifier.OVERRIDE)
                 .addModifiers(KModifier.SUSPEND)
@@ -205,19 +207,21 @@ class RootInjectCreator(
      * ApplicationEntryPoint 를 가진 프로젝트 내에서 직접 모듈을 만들경우 RootInjector 에 반영해준다.
      */
     private fun generateGetterFunctionApplicationModule() {
-        applicationModuleGeneratedTypes.forEach {
-            val className = ClassName.bestGuess(it.toString())
-            val name = "get${className.simpleNames.joinToString("")}"
-            FunSpec.builder(name)
+        applicationModuleGeneratedTypes.forEach { (methodName, returnType) ->
+            FunSpec.builder(methodName)
                 .addModifiers(KModifier.OVERRIDE)
                 .addModifiers(KModifier.SUSPEND)
                 .addParameter("owner", ComponentOwner::class)
-                .returns(it)
-                .addStatement("return super<${applicationModuleName}>.$name(owner)")
+                .returns(returnType)
+                .addStatement("return super<${applicationModuleName}>.$methodName(owner)")
                 .build()
                 .also(classSpec::addFunction)
 
-            conditionStatements.add("${it}::class -> ${name}(owner)")
+            val expectedWithoutAnnotation = createGetterFunctionName(ClassName.bestGuess(returnType.toString()), null)
+
+            if (expectedWithoutAnnotation == methodName) {
+                conditionStatements.add("${returnType}::class -> ${methodName}(owner)")
+            }
         }
     }
     /**

@@ -2,12 +2,14 @@ package kr.heukhyeon.sample
 
 import kotlinx.coroutines.delay
 import kr.heukhyeon.service_locator.Component
+import kr.heukhyeon.service_locator.ComponentQualifier
 
 interface SampleRepository {
     fun getTestText(): String
     suspend fun putLatestClickedTime() : String
 }
 
+@SampleQualifier
 @Component(isSingleton = true, bind = SampleRepository::class)
 class SampleRepositoryImpl : SampleRepository {
 
@@ -28,3 +30,5 @@ class SampleRepositoryImpl : SampleRepository {
     }
 }
 
+@ComponentQualifier
+annotation class SampleQualifier
