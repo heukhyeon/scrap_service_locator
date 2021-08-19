@@ -149,14 +149,15 @@ The implementation of SampleRepository must exist at runtime, but on the contrar
 So while annotating @Component, we add a few extras.
 
 ```kotlin
-@Component(isSingleton = true, bind = SampleRepository::class)
+@Component(scope = ComponentScope.IS_SINGLETON, bind = SampleRepository::class)
 class SampleRepositoryImpl : SampleRepository {
 }
 ```
 
-- isSingleton: Default is false. If true, an object created once is returned only as the same object for all dependency requests in the application lifecycle.
-
-If false , different unique objects are returned for different objects.
+- scope : Set the caching policy for requests for the same type of component.
+  - `SHARED_IF_EQUAL_OWNER` :  This is the default. Components with the same ComponentOwner share components.
+  - `IS_SINGLETON` : Once created, an object is returned for every request during the application cycle.
+  - `NOT_CACHED` : Whenever a request comes in, a new object is created. **Don't use it except in cases like RecyclerView.ViewHolder.**
 
 - bind : Specifies what type of class this class will be returned for dependency requests.
 
