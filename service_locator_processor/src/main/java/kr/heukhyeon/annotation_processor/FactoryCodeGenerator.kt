@@ -33,7 +33,7 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
                      */
                     if (param.typeName is ParameterizedTypeName && param.typeName.rawType.canonicalName == FactoryProvider.Factory::class.java.canonicalName) {
                         notImplementedMethods.remove(param)
-                        block.addCodeWithTab(4, "${param.name} = getFactory(%T::class),\n", param.typeName.typeArguments.first())
+                        block.addCodeWithTab(4, "${param.name} = getFactory(owner, %T::class),\n", param.typeName.typeArguments.first())
                     }
                     else {
                         block.addCodeWithTab(4, "${param.name} = $methodName(owner),\n")

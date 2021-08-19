@@ -28,14 +28,15 @@ interface AndroidDependencyModule : IComponentModule {
 
     @Suppress("UNCHECKED_CAST")
     suspend fun <T : FragmentParentListener> getFragmentParentListener(owner: ComponentOwner) : T {
-        require(owner is Fragment)
-        return owner.parentFragment as? T ?: owner.activity as? T ?: throw IllegalStateException()
+        val realOwner = if (owner is FakeComponentOwner) owner.realComponentOwner else owner
+        require(realOwner is Fragment)
+        return realOwner.parentFragment as? T ?: realOwner.activity as? T ?: throw IllegalStateException()
     }
 
     @Suppress("UNCHECKED_CAST")
     suspend fun <T : ViewHolderParentListener> getViewHolderParentListener(owner: ComponentOwner) : T {
-        require(owner is Activity || owner is Fragment)
-        return owner as T
+        require(owner is FakeComponentOwner)
+        return owner.realComponentOwner as T
     }
 
     suspend fun getViewBindingProvider(owner: ComponentOwner): ViewBindingProvider {

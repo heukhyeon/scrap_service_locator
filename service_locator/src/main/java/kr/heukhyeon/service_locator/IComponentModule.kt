@@ -13,8 +13,8 @@ interface IComponentModule {
 
     data class Key(val bindClazz: KClass<out Any>, val qualifier: String = "")
 
-    suspend fun <T : Any> getFactory(clazz : KClass<T>) : FactoryProvider.Factory<T> {
-        return FactoryProvider.Factory(clazz)
+    suspend fun <T : Any> getFactory(owner: ComponentOwner, clazz : KClass<T>) : FactoryProvider.Factory<T> {
+        return FactoryProvider.Factory(if (owner is FakeComponentOwner) owner.realComponentOwner else owner, clazz)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -26,8 +26,6 @@ interface IComponentModule {
 
     @Suppress("UNCHECKED_CAST")
     suspend fun <T : Any, R : T> cachingAndReturn(owner: ComponentOwner, key: Key, instance: T): T {
-        if (owner == NOT_CACHED_OWNER) return instance
-
         val scope = scopeMap[owner] ?: Scope(hashMapOf()).also {
             scopeMap[owner] = it
         }
@@ -37,9 +35,6 @@ interface IComponentModule {
 
     companion object {
         val SINGLETON_OWNER = object : ComponentOwner {
-            override val providerBuffer: LinkedList<IProvider<*>> = LinkedList()
-        }
-        val NOT_CACHED_OWNER = object : ComponentOwner {
             override val providerBuffer: LinkedList<IProvider<*>> = LinkedList()
         }
     }

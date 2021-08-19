@@ -3,6 +3,7 @@ package kr.heukhyeon.service_locator.provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kr.heukhyeon.service_locator.ComponentOwner
+import kr.heukhyeon.service_locator.FakeComponentOwner
 import kr.heukhyeon.service_locator.IComponentModule
 import kr.heukhyeon.service_locator.RootInjector
 import java.util.*
@@ -11,15 +12,12 @@ import kotlin.reflect.KProperty
 
 class FactoryProvider<T : Any>(private val clazz:KClass<T>) : IProvider<FactoryProvider.Factory<T>> {
 
-    class Factory<T : Any>(private val clazz: KClass<T>) {
+    class Factory<T : Any>(private val owner: ComponentOwner, private val clazz: KClass<T>) {
 
         fun create(): T {
             return runBlocking(Dispatchers.Default) {
-                val owner = object : ComponentOwner {
-                    override val providerBuffer: LinkedList<IProvider<*>>
-                        get() = LinkedList()
-                }
-                val instance = RootInjector.get(IComponentModule.NOT_CACHED_OWNER, clazz)
+                val owner = FakeComponentOwner(realComponentOwner = owner)
+                val instance = RootInjector.get(owner, clazz)
                 owner.dispose()
                 instance
             }
@@ -29,7 +27,7 @@ class FactoryProvider<T : Any>(private val clazz:KClass<T>) : IProvider<FactoryP
     private var factory : Factory<T>? = null
 
     override suspend fun inject(owner: ComponentOwner) {
-        factory = Factory(clazz)
+        factory = Factory(owner, clazz)
     }
 
     override fun finalize() {
