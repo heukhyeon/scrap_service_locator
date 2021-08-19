@@ -12,17 +12,11 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class ViewBindingProvider(private val context: Context) {
+class ViewBindingProvider(private val layoutInflater: LayoutInflater) {
 
-    init {
-        require(context is Application)
-    }
 
     suspend fun<T : ViewBinding> create(layoutId: Int, factory: (View)-> T) : T {
-        val inflater = withContext(Dispatchers.Main) {
-            LayoutInflater.from(context)
-        }
-        val view = inflater.inflate(layoutId, null)
+        val view = layoutInflater.inflate(layoutId, null)
         return factory(view)
     }
 }
