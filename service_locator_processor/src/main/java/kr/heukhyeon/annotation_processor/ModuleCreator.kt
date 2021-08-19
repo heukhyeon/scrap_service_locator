@@ -3,6 +3,7 @@ package kr.heukhyeon.annotation_processor
 import com.squareup.kotlinpoet.*
 import kr.heukhyeon.service_locator.*
 import kr.heukhyeon.service_locator.provider.Provider
+import java.lang.IllegalStateException
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
@@ -38,9 +39,26 @@ class ModuleCreator(
         .getElementsAnnotatedWith(EntryPoint::class.java)
         .flatMap { entryPoint ->
             entryPoint.enclosedElements.mapNotNull<Element, TypeMirror> { element ->
+
+                if (element.getComponentQualifier() != null) {
+                    val realName =
+                        element.simpleName
+                            .substring(0, element.simpleName.indexOf("\$annotations"))
+                            .drop(3)
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                            .mapIndexed { index, c -> if (index == 0) c.lowercaseChar() else c }
+                            .joinToString("")
+
+                    val err = "in ${entryPoint.simpleName}#$realName : inject field is Not Support Qualifier!!!"
+                    System.err.println(err)
+                    throw IllegalStateException(err)
+                }
+
                 if (element.asType().toString() == Provider::class.qualifiedName) {
+
                     val realName =
                         element.simpleName.substring(0, element.simpleName.indexOf("\$delegate"))
+
                     val functionName = "get" + realName.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(
                             Locale.getDefault()
