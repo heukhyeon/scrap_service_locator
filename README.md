@@ -77,7 +77,7 @@ I think it would be good if you take a look around the [sample project](https://
 The basic dependency injection method is the same as that of Koin.
 
 For classes that cannot control the constructor (activities, fragments, etc.), use the `inject()` delegate function,
-```
+```kotlin
 // if Activity, implements ActivityInitializer, if Fragment, implements FragmentInitializer
 class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
@@ -88,7 +88,7 @@ class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
 Classes that can control constructors (most classes) use `constructor` injection.
 
-```
+```kotlin
 class SamplePresenter(
     private val sampleRepository: SampleRepository // Interface.
 ) {
@@ -104,7 +104,7 @@ Let me explain it step by step.
 
 In the example above, `SamplePresenter` should be injected into `SampleActivity`, so it should be annotated with @Component.
 
-```
+```kotlin
 import kr.heukhyeon.service_locator.Component
 
 @Component
@@ -121,7 +121,7 @@ Taking the above example again, would `SampleRepository` also need the @Componen
 
 
 ### 2. Instead of adding @Component annotation to the interface, add @Component annotation to the class to be injected.
-```
+```kotlin
 // Types referenced in the presentation layer
 interface SampleRepository {
     fun getTestText(): String
@@ -148,7 +148,7 @@ The implementation of SampleRepository must exist at runtime, but on the contrar
 
 So while annotating @Component, we add a few extras.
 
-```
+```kotlin
 @Component(isSingleton = true, bind = SampleRepository::class)
 class SampleRepositoryImpl : SampleRepository {
 }
@@ -185,8 +185,7 @@ class SampleApp : Application(), AndroidInitializer {
 
 ### 4. Move your initialization logic after overriding the onInitialize function.
 
-<pre>
-@EntryPoint
+```kotlin
 class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
     private val presenter by inject(SamplePresenter::class)
@@ -224,7 +223,7 @@ class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
 ...
 
-</pre>
+```
 
 ### 5. If you are using proguard, add the following statement to your proguard rules.
 ```
