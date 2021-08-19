@@ -88,6 +88,7 @@ class ModuleCreator(
     private var containParcelable = false
     private var containParentListener = false
     private var containViewBindingProvider = false
+    private var containViewHolderParent = false
 
     /**
      * FunctionName to ReturnType
@@ -133,6 +134,10 @@ class ModuleCreator(
          * 현재 작성중인 모듈에서 ViewBinding 에 대한 종속성이 요구되는경우, ViewBindingProvider 추상함수를 추가한다.
          */
         if (containViewBindingProvider) absGenerator.generateAbstractGetterViewBindingProviderFunction().also(classSpec::addFunction)
+        /**
+         * 현재 작성중인 모듈에서 ViewHolderParentListener 에 대한 종속성이 요구되는경우 ViewHolderParentListener 추상함수를 추가한다.
+         */
+        if (containViewHolderParent) absGenerator.generateAbstractGetterViewHolderParentListenerFunction().also(classSpec::addFunction)
 
         generatedTypes = classSpec.funSpecs
             .filter { it.modifiers.contains(KModifier.ABSTRACT).not() }
@@ -158,12 +163,23 @@ class ModuleCreator(
                     )
                 )
             }
-            typeMirror.isSubType(absGenerator.parentListenerTypes) -> {
+            typeMirror.isSubType(absGenerator.viewHolderParentListenerTypes) -> {
+                containViewHolderParent = true
+                implementMethods.add(
+                    GetterFunSpecBuilder(
+                        componentType,
+                        ComponentScope.SHARED_IF_EQUAL_OWNER,
+                        null,
+                        factory.generateFactoryCodeForViewHolderParentListener()
+                    )
+                )
+            }
+            typeMirror.isSubType(absGenerator.fragmentParentListenerTypes) -> {
                 containParentListener = true
                 implementMethods.add(
                     GetterFunSpecBuilder(
                         componentType,
-                        ComponentScope.NOT_CACHED,
+                        ComponentScope.SHARED_IF_EQUAL_OWNER,
                         null,
                         factory.generateFactoryCodeForParentListener()
                     )

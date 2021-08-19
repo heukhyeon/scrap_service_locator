@@ -8,11 +8,8 @@ import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kr.heukhyeon.service_locator.ComponentModule
-import kr.heukhyeon.service_locator.ComponentOwner
-import kr.heukhyeon.service_locator.IComponentModule
+import kr.heukhyeon.service_locator.*
 import kr.heukhyeon.service_locator.initializer.FragmentInitializer
-import kr.heukhyeon.service_locator.FragmentParentListener
 import kr.heukhyeon.service_locator.initializer.ActivityInitializer
 import kr.heukhyeon.service_locator.initializer.provider.ViewBindingProvider
 import java.lang.IllegalStateException
@@ -33,6 +30,12 @@ interface AndroidDependencyModule : IComponentModule {
     suspend fun <T : FragmentParentListener> getFragmentParentListener(owner: ComponentOwner) : T {
         require(owner is Fragment)
         return owner.parentFragment as? T ?: owner.activity as? T ?: throw IllegalStateException()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    suspend fun <T : ViewHolderParentListener> getViewHolderParentListener(owner: ComponentOwner) : T {
+        require(owner is Activity || owner is Fragment)
+        return owner as T
     }
 
     suspend fun getViewBindingProvider(owner: ComponentOwner): ViewBindingProvider {

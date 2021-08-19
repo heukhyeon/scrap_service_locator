@@ -1,6 +1,5 @@
 package kr.heukhyeon.annotation_processor
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeVariableName
@@ -11,7 +10,8 @@ class AbstractCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelp
 
     val parcelableTypes = getType("android.os.Parcelable")
     val viewBindingTypes = getType("androidx.viewbinding.ViewBinding")
-    val parentListenerTypes = getType("kr.heukhyeon.service_locator.FragmentParentListener")
+    val fragmentParentListenerTypes = getType("kr.heukhyeon.service_locator.FragmentParentListener")
+    val viewHolderParentListenerTypes = getType("kr.heukhyeon.service_locator.ViewHolderParentListener")
 
     private val bindingProviderType =
         getType("kr.heukhyeon.service_locator.initializer.provider.ViewBindingProvider")
@@ -28,8 +28,19 @@ class AbstractCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelp
     }
 
     fun generateAbstractGetterParentListenerFunction(): FunSpec {
-        val bounds = parentListenerTypes!!.toClassName()
+        val bounds = fragmentParentListenerTypes!!.toClassName()
         return FunSpec.builder("getFragmentParentListener")
+            .addModifiers(KModifier.SUSPEND)
+            .addModifiers(KModifier.ABSTRACT)
+            .addTypeVariable(TypeVariableName.Companion.invoke("T", bounds))
+            .addParameter("owner", ComponentOwner::class)
+            .returns(TypeVariableName.invoke("T"))
+            .build()
+    }
+
+    fun generateAbstractGetterViewHolderParentListenerFunction(): FunSpec {
+        val bounds = viewHolderParentListenerTypes!!.toClassName()
+        return FunSpec.builder("getViewHolderParentListener")
             .addModifiers(KModifier.SUSPEND)
             .addModifiers(KModifier.ABSTRACT)
             .addTypeVariable(TypeVariableName.Companion.invoke("T", bounds))

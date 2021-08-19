@@ -73,4 +73,13 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
             .addCodeWithTab(3, "getFragmentParentListener(owner)\n")
             .build()
     }
+
+    /**
+     * ViewHolderParentListener 를 상속하는 타입에 대한 객체 생성 함수를 정의한다.
+     */
+    fun generateFactoryCodeForViewHolderParentListener(): CodeBlock {
+        return CodeBlock.builder()
+            .addCodeWithTab(3, "getViewHolderParentListener(owner)\n")
+            .build()
+    }
 }

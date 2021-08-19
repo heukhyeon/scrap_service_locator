@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kr.heukhyeon.service_locator.ComponentOwner
 import kr.heukhyeon.service_locator.IComponentModule
 import kr.heukhyeon.service_locator.RootInjector
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -14,7 +15,13 @@ class FactoryProvider<T : Any>(private val clazz:KClass<T>) : IProvider<FactoryP
 
         fun create(): T {
             return runBlocking(Dispatchers.Default) {
-                RootInjector.get(IComponentModule.NOT_CACHED_OWNER, clazz)
+                val owner = object : ComponentOwner {
+                    override val providerBuffer: LinkedList<IProvider<*>>
+                        get() = LinkedList()
+                }
+                val instance = RootInjector.get(IComponentModule.NOT_CACHED_OWNER, clazz)
+                owner.dispose()
+                instance
             }
         }
     }

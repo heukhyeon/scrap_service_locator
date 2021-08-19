@@ -53,25 +53,17 @@ class GetterFunSpecBuilder(
         val owner = when (scope) {
             ComponentScope.SHARED_IF_EQUAL_OWNER -> "owner"
             ComponentScope.IS_SINGLETON -> "IComponentModule.SINGLETON_OWNER"
-            ComponentScope.NOT_CACHED -> "IComponentModule.NOT_CACHED_OWNER"
         }
-
 
         FunSpec.builder(createGetterFunctionName(returnType, qualifier?.annotationType))
             .addModifiers(KModifier.SUSPEND)
             .addParameter("owner", ComponentOwner::class)
             .addStatement("val realOwner = $owner")
-            .apply {
-                if (scope != ComponentScope.NOT_CACHED) {
-                        addStatement("val key = IComponentModule.Key(%T::class, %S)", returnType, qualifier?.toString() ?: "")
-                        .addCode("return getCachedInstance(realOwner, key) ?: ")
-                        .addCode("cachingAndReturn(realOwner, key,\n")
-                        .addCode(factory)
-                        .addCode(")")
-                }
-                else
-                    addCode("return ").addCode(factory)
-            }
+            .addStatement("val key = IComponentModule.Key(%T::class, %S)", returnType, qualifier?.toString() ?: "")
+            .addCode("return getCachedInstance(realOwner, key) ?: ")
+            .addCode("cachingAndReturn(realOwner, key,\n")
+            .addCode(factory)
+            .addCode(")")
             .returns(returnType)
             .build()
             .also(classSpec::addFunction)
