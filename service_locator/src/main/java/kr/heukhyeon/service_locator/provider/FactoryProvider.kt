@@ -1,5 +1,6 @@
 package kr.heukhyeon.service_locator.provider
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kr.heukhyeon.service_locator.ComponentOwner
 import kr.heukhyeon.service_locator.RootInjector
@@ -11,7 +12,7 @@ class FactoryProvider<T : Any>(private val clazz:KClass<T>) : IProvider<FactoryP
     class Factory<T : Any>(private var owner: ComponentOwner?, private val clazz: KClass<T>) {
 
         fun create(): T {
-            return runBlocking {
+            return runBlocking(Dispatchers.Default) {
                 RootInjector.get(requireNotNull(owner), clazz)
             }
         }
