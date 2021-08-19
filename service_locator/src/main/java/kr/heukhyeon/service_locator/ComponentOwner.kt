@@ -1,9 +1,9 @@
 package kr.heukhyeon.service_locator
 
-import kr.heukhyeon.service_locator.provider.Provider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.runBlocking
+import kr.heukhyeon.service_locator.provider.FactoryProvider
+import kr.heukhyeon.service_locator.provider.IProvider
+import kr.heukhyeon.service_locator.provider.Provider
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
  */
 interface ComponentOwner {
 
-    val providerBuffer: LinkedList<Provider<*>>
+    val providerBuffer: LinkedList<IProvider<*>>
 
 
     suspend fun providerInit() {
@@ -32,11 +32,16 @@ interface ComponentOwner {
         RootInjector.onDisposeComponentOwner(this)
     }
 
-    fun <T : Any> inject(clazz: KClass<T>, injectImmediate:Boolean = false): Provider<T> {
+    fun <T : Any> inject(clazz: KClass<T>, injectImmediate: Boolean = false): IProvider<T> {
         val instance = Provider(clazz)
         providerBuffer.add(instance)
-            if (injectImmediate) runBlocking { instance.inject(this@ComponentOwner) }
-            return instance
+        if (injectImmediate) runBlocking { instance.inject(this@ComponentOwner) }
+        return instance
+    }
 
+    fun <T : Any> factory(clazz: KClass<T>): FactoryProvider<T> {
+        val instance = FactoryProvider(clazz)
+        providerBuffer.add(instance)
+        return instance
     }
 }

@@ -2,6 +2,7 @@ package kr.heukhyeon.annotation_processor
 
 import com.squareup.kotlinpoet.*
 import kr.heukhyeon.service_locator.*
+import kr.heukhyeon.service_locator.provider.IProvider
 import kr.heukhyeon.service_locator.provider.Provider
 import java.lang.IllegalStateException
 import java.util.*
@@ -22,6 +23,7 @@ class ModuleCreator(
     private val factory = FactoryCodeGenerator(process)
     private val absGenerator = AbstractCodeGenerator(process)
     private val implementMethods = mutableListOf<GetterFunSpecBuilder>()
+    private val providerType = runtimeEnv.elementUtils.getTypeElement(IProvider::class.java.canonicalName).asType()
 
     /**
      * @EntryPoint
@@ -54,7 +56,8 @@ class ModuleCreator(
                     throw IllegalStateException(err)
                 }
 
-                if (element.asType().toString() == Provider::class.qualifiedName) {
+                if (element.simpleName.endsWith("\$delegate") &&
+                    runtimeEnv.typeUtils.isAssignable(element.asType(), providerType)) {
 
                     val realName =
                         element.simpleName.substring(0, element.simpleName.indexOf("\$delegate"))

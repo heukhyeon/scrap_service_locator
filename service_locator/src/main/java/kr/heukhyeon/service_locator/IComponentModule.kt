@@ -1,25 +1,19 @@
 package kr.heukhyeon.service_locator
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kr.heukhyeon.service_locator.provider.Provider
+import kr.heukhyeon.service_locator.provider.IProvider
 import java.util.*
-import kotlin.collections.HashMap
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
 
 interface IComponentModule {
 
-    val scopeMap : HashMap<ComponentOwner, Scope>
+    val scopeMap: HashMap<ComponentOwner, Scope>
 
-    data class Scope(val instanceEntry : HashMap<Key, Any>)
+    data class Scope(val instanceEntry: HashMap<Key, Any>)
 
-    data class Key(val bindClazz : KClass<out Any>, val qualifier: String = "")
+    data class Key(val bindClazz: KClass<out Any>, val qualifier: String = "")
 
     @Suppress("UNCHECKED_CAST")
-    suspend fun <T: Any> getCachedInstance(owner: ComponentOwner, key: Key) : T? {
+    suspend fun <T : Any> getCachedInstance(owner: ComponentOwner, key: Key): T? {
         if (scopeMap.containsKey(owner).not()) return null
 
         return scopeMap[owner]!!.instanceEntry[key] as? T
@@ -36,7 +30,7 @@ interface IComponentModule {
 
     companion object {
         val SINGLETON_OWNER = object : ComponentOwner {
-            override val providerBuffer: LinkedList<Provider<*>> = LinkedList()
+            override val providerBuffer: LinkedList<IProvider<*>> = LinkedList()
         }
     }
 }

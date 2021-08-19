@@ -35,8 +35,10 @@ interface AndroidInitializer : Initializer {
     @Suppress("UNCHECKED_CAST")
     fun getViewProviders() : List<Provider<out ViewBinding>> {
         return providerBuffer.mapNotNull {
-            if (it.clazz.java.interfaces.contains(ViewBinding::class.java)) {
-                return@mapNotNull it as Provider<out ViewBinding>
+            if (it is Provider<*>) {
+                if (it.clazz.java.interfaces.contains(ViewBinding::class.java)) {
+                    return@mapNotNull it as Provider<out ViewBinding>
+                }
             }
             return@mapNotNull null
         }

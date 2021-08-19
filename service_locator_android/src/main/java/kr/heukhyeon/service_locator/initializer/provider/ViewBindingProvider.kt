@@ -3,6 +3,7 @@ package kr.heukhyeon.service_locator.initializer.provider
 import android.app.Application
 import android.content.Context
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.viewbinding.ViewBinding
@@ -20,13 +21,9 @@ class ViewBindingProvider(private val context: Context) {
     suspend fun<T : ViewBinding> create(layoutId: Int, factory: (View)-> T) : T {
         require(Looper.getMainLooper() != Looper.myLooper())
         val inflater = withContext(Dispatchers.Main) {
-            AsyncLayoutInflater(context)
+            LayoutInflater.from(context)
         }
-        val view = suspendCoroutine<View> {
-            inflater.inflate(layoutId, null) { view, _, _ ->
-                it.resume(view)
-            }
-        }
+        val view = inflater.inflate(layoutId, null)
         require(Looper.getMainLooper() != Looper.myLooper())
         return factory(view)
     }

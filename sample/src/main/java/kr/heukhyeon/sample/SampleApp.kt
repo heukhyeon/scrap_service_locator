@@ -10,13 +10,14 @@ import kr.heukhyeon.service_locator.Initializer
 import kr.heukhyeon.service_locator.RootInjector
 import kr.heukhyeon.service_locator.initializer.AndroidInitializer
 import kr.heukhyeon.service_locator.lifecycle.InjectLifecycleManager
+import kr.heukhyeon.service_locator.provider.IProvider
 import kr.heukhyeon.service_locator.provider.Provider
 import java.util.*
 
 @ApplicationEntryPoint
 class SampleApp : Application(), AndroidInitializer {
 
-    override val providerBuffer = LinkedList<Provider<*>>()
+    override val providerBuffer = LinkedList<IProvider<*>>()
 
     override fun getCoroutineScope(): CoroutineScope {
         return GlobalScope

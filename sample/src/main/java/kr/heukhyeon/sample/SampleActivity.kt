@@ -14,13 +14,14 @@ import kr.heukhyeon.service_locator.EntryPoint
 import kr.heukhyeon.service_locator.Initializer
 import kr.heukhyeon.service_locator.initializer.ActivityInitializer
 import kr.heukhyeon.service_locator.initializer.AndroidInitializer
+import kr.heukhyeon.service_locator.provider.IProvider
 import kr.heukhyeon.service_locator.provider.Provider
 import java.util.*
 
 @EntryPoint
 class SampleActivity : AppCompatActivity(), ActivityInitializer {
 
-    override val providerBuffer: LinkedList<Provider<*>> = LinkedList()
+    override val providerBuffer: LinkedList<IProvider<*>> = LinkedList()
 
     override val proceeded = MutableStateFlow(Initializer.Phase.NOT_INITIALIZE)
 
