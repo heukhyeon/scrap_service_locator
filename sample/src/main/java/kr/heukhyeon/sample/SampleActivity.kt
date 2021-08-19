@@ -40,6 +40,9 @@ class SampleActivity : AppCompatActivity(), ActivityInitializer {
         super.onInitialize()
         withContext(Dispatchers.Main) {
             binding.textView.text = presenter.getTestText()
+            binding.viewSwitch.setOnCheckedChangeListener { _, isChecked ->
+                binding.textView.text = presenter.updateChecked(isChecked)
+            }
             binding.updateButtonView.setOnClickListener {
                 binding.updateButtonView.isEnabled = false
                 binding.loadingView.visibility = View.VISIBLE

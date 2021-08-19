@@ -9,9 +9,26 @@ interface SampleRepository {
     suspend fun putLatestClickedTime() : String
 }
 
-@SampleQualifier
 @Component(isSingleton = true, bind = SampleRepository::class)
 class SampleRepositoryImpl : SampleRepository {
+
+    private val time = System.currentTimeMillis()
+
+    override fun getTestText(): String {
+        val createTime = "Create Time Millis : $time"
+        val clickTime = "Latest Click Time : GONE"
+
+        return listOf(createTime, clickTime).joinToString("\n")
+    }
+
+    override suspend fun putLatestClickedTime(): String {
+        return getTestText()
+    }
+}
+
+@SampleQualifier
+@Component(isSingleton = true, bind = SampleRepository::class)
+class SampleRepositoryImpl2 : SampleRepository {
 
     private val time = System.currentTimeMillis()
     private var latestClickedTime : Long? = null

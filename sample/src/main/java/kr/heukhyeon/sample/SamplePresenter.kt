@@ -4,15 +4,24 @@ import kr.heukhyeon.service_locator.Component
 
 @Component
 class SamplePresenter(
-    @SampleQualifier private val sampleRepository: SampleRepository,
-    private val sampleRepository2: SampleRepository
-    ) {
+    private val sampleRepository: SampleRepository,
+    @SampleQualifier private val sampleRepository2: SampleRepository
+) {
 
-    fun getTestText(): String {
-        return sampleRepository.getTestText()
+    private var isUseQualifier = false
+
+    fun updateChecked(checked:Boolean): String {
+        isUseQualifier = checked
+        return getTestText()
     }
 
-    suspend fun updateClickedTime() : String {
-        return sampleRepository.putLatestClickedTime()
+    fun getTestText(): String {
+         return if (isUseQualifier) sampleRepository2.getTestText()
+        else sampleRepository.getTestText()
+    }
+
+    suspend fun updateClickedTime(): String {
+        sampleRepository2.putLatestClickedTime()
+        return getTestText()
     }
 }
