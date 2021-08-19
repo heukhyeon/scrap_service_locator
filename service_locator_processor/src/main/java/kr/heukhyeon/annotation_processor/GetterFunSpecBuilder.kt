@@ -1,6 +1,7 @@
 package kr.heukhyeon.annotation_processor
 
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import kr.heukhyeon.service_locator.Component
 import kr.heukhyeon.service_locator.ComponentOwner
 import kr.heukhyeon.service_locator.ComponentScope
@@ -17,7 +18,7 @@ import javax.lang.model.type.TypeMirror
  * [scope] : 해당 객체의 중복 요청시에 대한 스코프 정책
  */
 class GetterFunSpecBuilder(
-    private val returnType: ClassName,
+    private val returnType: TypeName,
     private val scope: ComponentScope,
     private val qualifier: AnnotationMirror?,
     private val factory: CodeBlock
@@ -36,7 +37,14 @@ class GetterFunSpecBuilder(
             qualifier
         )
 
-        val typeName = ClassName.bestGuess(type.toString())
+        val typeName = type.toString().let {
+            if (it.contains("<").not()) return@let ClassName.bestGuess(it)
+
+            val origin = it.substring(0, it.indexOf("<"))
+            val param = it.substring(it.indexOf("<") + 1, it.lastIndexOf(">"))
+
+            ClassName.bestGuess(origin).parameterizedBy(ClassName.bestGuess(param))
+        }
     }
 
     fun build(classSpec: TypeSpec.Builder) {

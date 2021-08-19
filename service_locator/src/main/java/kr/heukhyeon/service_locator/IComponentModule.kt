@@ -1,5 +1,6 @@
 package kr.heukhyeon.service_locator
 
+import kr.heukhyeon.service_locator.provider.FactoryProvider
 import kr.heukhyeon.service_locator.provider.IProvider
 import java.util.*
 import kotlin.reflect.KClass
@@ -11,6 +12,10 @@ interface IComponentModule {
     data class Scope(val instanceEntry: HashMap<Key, Any>)
 
     data class Key(val bindClazz: KClass<out Any>, val qualifier: String = "")
+
+    suspend fun <T : Any> getFactory(clazz : KClass<T>) : FactoryProvider.Factory<T> {
+        return FactoryProvider.Factory(clazz)
+    }
 
     @Suppress("UNCHECKED_CAST")
     suspend fun <T : Any> getCachedInstance(owner: ComponentOwner, key: Key): T? {
