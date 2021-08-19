@@ -3,13 +3,14 @@ package kr.heukhyeon.sample
 import kotlinx.coroutines.delay
 import kr.heukhyeon.service_locator.Component
 import kr.heukhyeon.service_locator.ComponentQualifier
+import kr.heukhyeon.service_locator.ComponentScope
 
 interface SampleRepository {
     fun getTestText(): String
     suspend fun putLatestClickedTime() : String
 }
 
-@Component(isSingleton = true, bind = SampleRepository::class)
+@Component(scope = ComponentScope.IS_SINGLETON, bind = SampleRepository::class)
 class SampleRepositoryImpl : SampleRepository {
 
     private val time = System.currentTimeMillis()
@@ -27,7 +28,7 @@ class SampleRepositoryImpl : SampleRepository {
 }
 
 @SampleQualifier
-@Component(isSingleton = true, bind = SampleRepository::class)
+@Component(scope = ComponentScope.IS_SINGLETON, bind = SampleRepository::class)
 class SampleRepositoryImpl2 : SampleRepository {
 
     private val time = System.currentTimeMillis()

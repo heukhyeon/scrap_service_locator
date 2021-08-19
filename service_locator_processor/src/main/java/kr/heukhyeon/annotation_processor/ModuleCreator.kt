@@ -3,7 +3,6 @@ package kr.heukhyeon.annotation_processor
 import com.squareup.kotlinpoet.*
 import kr.heukhyeon.service_locator.*
 import kr.heukhyeon.service_locator.provider.IProvider
-import kr.heukhyeon.service_locator.provider.Provider
 import java.lang.IllegalStateException
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
@@ -98,11 +97,11 @@ class ModuleCreator(
     fun create(): TypeSpec {
         targets.forEach { it ->
             val componentType = getComponentType(it)
-            val isSingleton = it.getAnnotation(Component::class.java).isSingleton
+            val scope = it.getAnnotation(Component::class.java).scope
             implementMethods.add(
                 GetterFunSpecBuilder(
                     componentType,
-                    isSingleton,
+                    scope,
                     it.getComponentQualifier(),
                     factory.generateFactoryCodeForNormal(it, notImplementedMethods)
                 )
@@ -153,7 +152,7 @@ class ModuleCreator(
                 implementMethods.add(
                     GetterFunSpecBuilder(
                         componentType,
-                        false,
+                        ComponentScope.SHARED_IF_EQUAL_OWNER,
                         null,
                         factory.generateFactoryCodeForParcelable()
                     )
@@ -164,7 +163,7 @@ class ModuleCreator(
                 implementMethods.add(
                     GetterFunSpecBuilder(
                         componentType,
-                        false,
+                        ComponentScope.NOT_CACHED,
                         null,
                         factory.generateFactoryCodeForParentListener()
                     )
@@ -175,7 +174,7 @@ class ModuleCreator(
                 implementMethods.add(
                     GetterFunSpecBuilder(
                         componentType,
-                        false,
+                        ComponentScope.SHARED_IF_EQUAL_OWNER,
                         null,
                         factory.generateFactoryCodeForViewBinding(componentType)
                     )
