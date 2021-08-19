@@ -19,12 +19,10 @@ class ViewBindingProvider(private val context: Context) {
     }
 
     suspend fun<T : ViewBinding> create(layoutId: Int, factory: (View)-> T) : T {
-        require(Looper.getMainLooper() != Looper.myLooper())
         val inflater = withContext(Dispatchers.Main) {
             LayoutInflater.from(context)
         }
         val view = inflater.inflate(layoutId, null)
-        require(Looper.getMainLooper() != Looper.myLooper())
         return factory(view)
     }
 }
