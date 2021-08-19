@@ -60,11 +60,11 @@ kapt {
 }
 
 dependencies {
-    def last_version = '0.0.3-alpha'
+    def latest_version = '0.0.3-alpha-recyclerview'
 ...
-    implementation "com.github.heukhyeon:scrap_service_locator:$last_version"
-    implementation "com.github.heukhyeon:scrap_service_locator_android:$last_version"
-    kapt "com.github.heukhyeon:scrap_service_locator:$last_version"
+    implementation "com.github.heukhyeon:scrap_service_locator:$latest_version"
+    implementation "com.github.heukhyeon:scrap_service_locator_android:$latest_version"
+    kapt "com.github.heukhyeon:scrap_service_locator:$latest_version"
 }
 ```
 
