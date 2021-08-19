@@ -60,7 +60,7 @@ kapt {
 }
 
 dependencies {
-    def last_version = '0.0.2.5-alpha'
+    def last_version = '0.0.3-alpha'
 ...
     implementation "com.github.heukhyeon:scrap_service_locator:$last_version"
     implementation "com.github.heukhyeon:scrap_service_locator_android:$last_version"
