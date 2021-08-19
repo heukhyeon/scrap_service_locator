@@ -2,13 +2,11 @@ package io.anonymous.module
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Resources
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import kr.heukhyeon.service_locator.ComponentModule
 import kr.heukhyeon.service_locator.ComponentOwner
 import kr.heukhyeon.service_locator.IComponentModule
-import kr.heukhyeon.service_locator.initializer.AndroidInitializer
 import kr.heukhyeon.service_locator.initializer.FragmentInitializer
 import kr.heukhyeon.service_locator.FragmentParentListener
 import kr.heukhyeon.service_locator.initializer.ActivityInitializer
@@ -34,15 +32,9 @@ interface AndroidDependencyModule : IComponentModule {
     }
 
     suspend fun getViewBindingProvider(owner: ComponentOwner): ViewBindingProvider {
-        return cachingAndReturn(IComponentModule.SINGLETON_OWNER, ViewBindingProvider::class) {
-            ViewBindingProvider(getContext(owner))
-        }
-    }
-
-    suspend fun getResources(owner: ComponentOwner): Resources {
-        return cachingAndReturn(IComponentModule.SINGLETON_OWNER, Resources::class) {
-            getContext(owner).resources
-        }
+        return cachingAndReturn(IComponentModule.SINGLETON_OWNER,
+            IComponentModule.Key(ViewBindingProvider::class),
+            ViewBindingProvider(getContext(owner)))
     }
 
     suspend fun getContext(owner: ComponentOwner) : Context

@@ -21,7 +21,6 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
         notImplementedMethods.addAll(params)
 
         return CodeBlock.builder()
-            .add("{\n")
             .addCodeWithTab(3, "%T(\n", element.asType())
             .also { block ->
                 params.forEach { param ->
@@ -30,7 +29,6 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
                 }
             }
             .addCodeWithTab(3, ")\n")
-            .addCodeWithTab(2, "}\n")
             .build()
     }
 
@@ -39,12 +37,10 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
      */
     fun generateFactoryCodeForViewBinding(targetType: ClassName): CodeBlock {
         return CodeBlock.builder()
-            .add("{\n")
             .addCodeWithTab(3, "getViewBindingProvider(owner).create(\n")
             .addCodeWithTab(4, "layoutId = ${viewBindingToPackageAndLayoutId(targetType)},\n")
             .addCodeWithTab(4, "factory = ${targetType.simpleName}::bind\n")
             .addCodeWithTab(3, ")\n")
-            .addCodeWithTab(2, "}\n")
             .build()
     }
 
@@ -53,9 +49,7 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
      */
     fun generateFactoryCodeForParcelable(): CodeBlock {
         return CodeBlock.builder()
-            .add("{\n")
             .addCodeWithTab(3, "getParcelable(owner)\n")
-            .addCodeWithTab(2, "}\n")
             .build()
     }
 
@@ -64,9 +58,7 @@ class FactoryCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelpe
      */
     fun generateFactoryCodeForParentListener(): CodeBlock {
         return CodeBlock.builder()
-            .add("{\n")
             .addCodeWithTab(3, "getFragmentParentListener(owner)\n")
-            .addCodeWithTab(2, "}\n")
             .build()
     }
 }
