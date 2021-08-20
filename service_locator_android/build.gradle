@@ -4,14 +4,7 @@ import java.util.regex.Pattern
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'maven-publish'
-}
-
-kapt {
-    arguments {
-        arg("moduleName", "AndroidDependencyModule")
-    }
 }
 
 android {
@@ -90,7 +83,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation project(":service_locator")
-    kapt project(":service_locator_processor")
 }
 
 task sourceJar(type: Jar) {

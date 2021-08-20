@@ -53,7 +53,7 @@ android {
 
                     // You can then customize attributes of the publication as shown below.
                     groupId 'kr.heukhyeon'
-                    artifactId 'service_locator_android_viewbinding'
+                    artifactId 'service_locator_android_recyclerview'
                     version = publishVersion
                 }
                 // Creates a Maven publication called “debug”.
@@ -62,7 +62,7 @@ android {
                     from components.debug
 
                     groupId 'kr.heukhyeon'
-                    artifactId 'service_locator_android_viewbinding'
+                    artifactId 'service_locator_android_recyclerview'
                     version = publishVersion
                 }
             }

@@ -10,8 +10,8 @@ class AbstractCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelp
 
     val parcelableTypes = getType("android.os.Parcelable")
     val viewBindingTypes = getType("androidx.viewbinding.ViewBinding")
-    val fragmentParentListenerTypes = getType("kr.heukhyeon.service_locator.FragmentParentListener")
-    val viewHolderParentListenerTypes = getType("kr.heukhyeon.service_locator.ViewHolderParentListener")
+    val fragmentParentListenerTypes = getType("kr.heukhyeon.service_locator.fragment.FragmentParentListener")
+    val viewHolderParentListenerTypes = getType("kr.heukhyeon.service_locator.recyclerview.ViewHolderParentListener")
 
     private val bindingProviderType =
         getType("kr.heukhyeon.service_locator.viewbinding.ViewBindingProvider")

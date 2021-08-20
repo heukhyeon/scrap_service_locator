@@ -5,7 +5,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
-import kr.heukhyeon.service_locator.FragmentParentListener
+import kr.heukhyeon.service_locator.fragment.FragmentParentListener
 import kr.heukhyeon.service_locator.Initializer
 import kr.heukhyeon.service_locator.initializer.FragmentInitializer
 import kr.heukhyeon.service_locator.provider.Provider
