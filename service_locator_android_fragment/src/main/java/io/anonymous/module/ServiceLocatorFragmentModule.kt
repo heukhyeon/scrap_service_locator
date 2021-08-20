@@ -8,16 +8,15 @@ import kr.heukhyeon.service_locator.ComponentOwner
 import kr.heukhyeon.service_locator.FakeComponentOwner
 import kr.heukhyeon.service_locator.IComponentModule
 import kr.heukhyeon.service_locator.fragment.FragmentParentListener
-import kr.heukhyeon.service_locator.initializer.ActivityInitializer
-import kr.heukhyeon.service_locator.initializer.FragmentInitializer
+import kr.heukhyeon.service_locator.fragment.ServiceLocatorFragmentKeys
 
 @ComponentModule
 interface ServiceLocatorFragmentModule : IComponentModule {
 
     suspend fun <T : Parcelable> getParcelable(owner: ComponentOwner): T {
         val (bundle, key) = when (owner) {
-            is Fragment -> owner.arguments to FragmentInitializer.KEY_FRAGMENT_UNIQUE_EXTRA
-            is Activity -> owner.intent.extras to ActivityInitializer.KEY_ACTIVITY_UNIQUE_EXTRA
+            is Fragment -> owner.arguments to ServiceLocatorFragmentKeys.KEY_FRAGMENT_UNIQUE_EXTRA
+            is Activity -> owner.intent.extras to ServiceLocatorFragmentKeys.KEY_ACTIVITY_UNIQUE_EXTRA
             else -> throw IllegalStateException("$owner is Must Fragment or Activity")
         }
         return requireNotNull(bundle?.getParcelable(key))

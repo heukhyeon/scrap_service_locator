@@ -12,14 +12,12 @@ import kotlinx.coroutines.withContext
 import kr.heukhyeon.sample.databinding.ActivitySampleBinding
 import kr.heukhyeon.service_locator.EntryPoint
 import kr.heukhyeon.service_locator.Initializer
-import kr.heukhyeon.service_locator.initializer.ActivityInitializer
 import kr.heukhyeon.service_locator.initializer.AndroidInitializer
 import kr.heukhyeon.service_locator.provider.IProvider
-import kr.heukhyeon.service_locator.provider.Provider
 import java.util.*
 
 @EntryPoint
-class SampleActivity : AppCompatActivity(), ActivityInitializer {
+class SampleActivity : AppCompatActivity(), AndroidInitializer {
 
     override val providerBuffer: LinkedList<IProvider<*>> = LinkedList()
 
@@ -40,6 +38,7 @@ class SampleActivity : AppCompatActivity(), ActivityInitializer {
     override suspend fun onInitialize() {
         super.onInitialize()
         withContext(Dispatchers.Main) {
+            setContentView(binding.root)
             binding.textView.text = presenter.getTestText()
             binding.viewSwitch.setOnCheckedChangeListener { _, isChecked ->
                 binding.textView.text = presenter.updateChecked(isChecked)

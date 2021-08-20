@@ -10,9 +10,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
-    buildFeatures {
-        viewBinding = true
-    }
+
     libraryVariants.all { variant ->
         variant.outputs.each { output ->
             java.nio.file.Path path = output.outputFile.toPath()
