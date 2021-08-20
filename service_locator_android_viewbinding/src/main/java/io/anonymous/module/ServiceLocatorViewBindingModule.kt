@@ -11,7 +11,7 @@ import kr.heukhyeon.service_locator.IComponentModule
 import kr.heukhyeon.service_locator.viewbinding.ViewBindingProvider
 
 @ComponentModule
-interface AndroidViewBindingModule : IComponentModule {
+interface ServiceLocatorViewBindingModule : IComponentModule {
 
     suspend fun getViewBindingProvider(owner: ComponentOwner): ViewBindingProvider {
         val realOwner = IComponentModule.SINGLETON_OWNER

@@ -54,6 +54,8 @@ dependencies {
 
     implementation project(":service_locator_android")
     implementation project(":service_locator_android_viewbinding")
+    implementation project(":service_locator_android_fragment")
+    implementation project(":service_locator_android_recyclerview")
     implementation project(":service_locator")
     implementation project(":service_locator_processor")
 

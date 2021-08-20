@@ -1,0 +1,71 @@
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 1
+        versionName publishVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    buildFeatures {
+        viewBinding = true
+    }
+    libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            java.nio.file.Path path = output.outputFile.toPath()
+            def relativeRootDir = path.relativize(rootProject.projectDir.toPath()).toFile()
+            output.outputFileName = "$relativeRootDir\\scrap_service_locator\\projectJars\\${projectDir.name}_${publishVersion}.aar"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    afterEvaluate {
+        publishing {
+            publications {
+                // Creates a Maven publication called "release".
+                release(MavenPublication) {
+                    // Applies the component for the release build variant.
+                    from components.release
+
+                    // You can then customize attributes of the publication as shown below.
+                    groupId 'kr.heukhyeon'
+                    artifactId projectDir.name
+                    version = publishVersion
+                }
+                // Creates a Maven publication called “debug”.
+                debug(MavenPublication) {
+                    // Applies the component for the debug build variant.
+                    from components.debug
+
+                    groupId 'kr.heukhyeon'
+                    artifactId projectDir.name
+                    version = publishVersion
+                }
+            }
+        }
+    }
+
+}
+
+dependencies {
+    implementation "androidx.asynclayoutinflater:asynclayoutinflater:1.0.0"
+    implementation project(":service_locator")
+    if (projectDir.name != "service_locator_android") {
+        implementation project(":service_locator_android")
+    }
+}
