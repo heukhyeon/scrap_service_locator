@@ -1,4 +1,4 @@
-package kr.heukhyeon.service_locator.initializer.provider
+package kr.heukhyeon.service_locator.viewbinding
 
 import android.app.Application
 import android.content.Context

@@ -1,5 +1,6 @@
 include ':service_locator'
 include ':service_locator_android'
+include ':service_locator_android_viewbinding'
 include ':service_locator_processor'
 //include ':serviceLocator-AndroidScene'
 

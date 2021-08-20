@@ -14,7 +14,7 @@ class AbstractCodeGenerator(environment: ProcessingEnvironment) : CodeCreateHelp
     val viewHolderParentListenerTypes = getType("kr.heukhyeon.service_locator.ViewHolderParentListener")
 
     private val bindingProviderType =
-        getType("kr.heukhyeon.service_locator.initializer.provider.ViewBindingProvider")
+        getType("kr.heukhyeon.service_locator.viewbinding.ViewBindingProvider")
 
     fun generateAbstractGetterParcelableFunction(): FunSpec {
         val bounds = parcelableTypes!!.toClassName()
