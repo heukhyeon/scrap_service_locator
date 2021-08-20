@@ -83,8 +83,7 @@ The basic dependency injection method is the same as that of Koin.
 
 For classes that cannot control the constructor (activities, fragments, etc.), use the `inject()` delegate function,
 ```kotlin
-// if Activity, implements ActivityInitializer, if Fragment, implements FragmentInitializer
-class SampleActivity : AppCompatActivity(), ActivityInitializer {
+class SampleActivity : AppCompatActivity(), AndroidInitializer {
 
    ...
     private val presenter by inject(SamplePresenter::class)
@@ -192,7 +191,7 @@ class SampleApp : Application(), AndroidInitializer {
 ### 4. Move your initialization logic after overriding the onInitialize function.
 
 ```kotlin
-class SampleActivity : AppCompatActivity(), ActivityInitializer {
+class SampleActivity : AppCompatActivity(), AndroidInitializer {
 
     private val presenter by inject(SamplePresenter::class)
     private val binding by inject(ActivitySampleBinding::class)
