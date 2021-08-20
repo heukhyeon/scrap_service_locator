@@ -60,11 +60,16 @@ kapt {
 }
 
 dependencies {
-    def latest_version = '0.0.3-alpha-recyclerview'
+    def latest_version = '0.0.3.5-alpha-recyclerview'
 ...
     implementation "com.github.heukhyeon:scrap_service_locator:$latest_version"
     implementation "com.github.heukhyeon:scrap_service_locator_android:$latest_version"
     kapt "com.github.heukhyeon:scrap_service_locator:$latest_version"
+    
+    // The dependencies below are optional. Please refer to the wiki for what each role does.
+    implementation "com.github.heukhyeon:scrap_service_locator_android_viewbinding:$latest_version"
+    implementation "com.github.heukhyeon:scrap_service_locator_android_fragment:$latest_version"
+    implementation "com.github.heukhyeon:scrap_service_locator_android_recyclerview:$latest_version"
 }
 ```
 
