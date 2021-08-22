@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kr.heukhyeon.sample.databinding.ActivitySampleBinding
+import kr.heukhyeon.sample.databinding.ActivitySampleLoadingBinding
 import kr.heukhyeon.service_locator.EntryPoint
 import kr.heukhyeon.service_locator.Initializer
 import kr.heukhyeon.service_locator.initializer.AndroidInitializer
@@ -24,6 +25,7 @@ class SampleActivity : AppCompatActivity(), AndroidInitializer {
     override val proceeded = MutableStateFlow(Initializer.Phase.NOT_INITIALIZE)
 
     private val presenter by inject(SamplePresenter::class)
+    private val loadingBinding by injectReacting(ActivitySampleLoadingBinding::class)
     private val binding by inject(ActivitySampleBinding::class)
 
     override fun getCoroutineScope(): CoroutineScope {
@@ -32,7 +34,7 @@ class SampleActivity : AppCompatActivity(), AndroidInitializer {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sample_loading)
+        setContentView(loadingBinding.root)
     }
 
     override suspend fun onInitialize() {
