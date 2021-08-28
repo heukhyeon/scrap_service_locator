@@ -121,9 +121,9 @@ class RootInjectCreator(
         PropertySpec.builder(
             "scopeMap",
             HashMap::class.parameterizedBy(
-                    ComponentOwner::class,
-                    IComponentModule.Scope::class
-                )
+                ComponentOwner::class,
+                IComponentModule.Scope::class
+            )
         )
             .addModifiers(KModifier.OVERRIDE)
             .initializer("HashMap()")
@@ -132,26 +132,38 @@ class RootInjectCreator(
     }
 
     private fun generateGetterFunction(module: Class<out IComponentModule>) {
-        getDefaultImplementedFunctions(module).forEach { method ->
-            val name = method.name
-            FunSpec.builder(method.name)
-                .addModifiers(KModifier.OVERRIDE)
-                .addModifiers(KModifier.SUSPEND)
-                .also { spec ->
-                    method.typeParameters.forEach {
-                        spec.addTypeVariable(it.asTypeVariableName())
-                    }
-                }
-                .addParameter("owner", ComponentOwner::class)
-                .returns(method.returnType.asTypeName())
-                .addStatement("return super<${module.simpleName}>.$name(owner)")
-                .build()
-                .also(classSpec::addFunction)
-
-            if (method.typeParameters.isEmpty()){
-                conditionStatements.add("${method.returnType}::class -> ${method.name}(owner)")
+        getDefaultImplementedFunctions(module)
+            /**
+             * TODO 임시대응
+             * 다중 모듈에서 공통 정의가 되는 함수가 존재할경우,
+             * 가장 앞선 하나의 정의만을 따라간다.
+             */
+            .filter { method ->
+                classSpec.funSpecs.indexOfFirst {
+                    it.name == method.name &&
+                            it.returnType == method.returnType.asTypeName()
+                } == -1
             }
-        }
+            .forEach { method ->
+                val name = method.name
+                FunSpec.builder(method.name)
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addModifiers(KModifier.SUSPEND)
+                    .also { spec ->
+                        method.typeParameters.forEach {
+                            spec.addTypeVariable(it.asTypeVariableName())
+                        }
+                    }
+                    .addParameter("owner", ComponentOwner::class)
+                    .returns(method.returnType.asTypeName())
+                    .addStatement("return super<${module.simpleName}>.$name(owner)")
+                    .build()
+                    .also(classSpec::addFunction)
+
+                if (method.typeParameters.isEmpty()) {
+                    conditionStatements.add("${method.returnType}::class -> ${method.name}(owner)")
+                }
+            }
 
     }
 
@@ -217,13 +229,15 @@ class RootInjectCreator(
                 .build()
                 .also(classSpec::addFunction)
 
-            val expectedWithoutAnnotation = createGetterFunctionName(ClassName.bestGuess(returnType.toString()), null)
+            val expectedWithoutAnnotation =
+                createGetterFunctionName(ClassName.bestGuess(returnType.toString()), null)
 
             if (expectedWithoutAnnotation == methodName) {
                 conditionStatements.add("${returnType}::class -> ${methodName}(owner)")
             }
         }
     }
+
     /**
      * kotlin 1.5 기준으로, 기존 Java Interface 의 함수에 대해 기본 구현이 되었는지 여부를 표시하는 [java.lang.reflect.Method.isDefault] 는
      * 언제나 false 다.
@@ -249,7 +263,9 @@ class RootInjectCreator(
          * DeclaredMethod가 아닌 일반 Methods 를 사용하면 상위 인터페이스에 있는 기본구현 함수까지 모두 딸려온다.
          */
         return module.kotlin.members.filter {
-            it.isOpen && defaultMethods.contains(it.name) && rootInterfaceImplementMethods.contains(it.name).not()
+            it.isOpen && defaultMethods.contains(it.name) && rootInterfaceImplementMethods.contains(
+                it.name
+            ).not()
         }
     }
 }
